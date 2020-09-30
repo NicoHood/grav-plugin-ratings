@@ -1,21 +1,24 @@
 name: Ratings
 slug: ratings
 type: plugin
-version: 0.1.0
+version: 1.0.0
 description: A plugin for add 5 star ratings and reviews to grav pages.
-icon: plug
+icon: star
 author:
   name: NicoHood
   email: grav@nicohood.de
 homepage: https://github.com/nicohood/grav-plugin-ratings
 demo: http://demo.yoursite.com
-keywords: grav, plugin, etc
+keywords: grav, plugin, rating, review, star
 bugs: https://github.com/nicohood/grav-plugin-ratings/issues
 docs: https://github.com/nicohood/grav-plugin-ratings/blob/develop/README.md
-license: MIT
+license: GPL3
 
 dependencies:
   - { name: grav, version: '>=1.6.0' }
+  - form
+  - email
+  - database
 
 form:
   validation: loose
@@ -30,7 +33,3 @@ form:
         0: PLUGIN_ADMIN.DISABLED
       validate:
         type: bool
-    text_var:
-      type: text
-      label: PLUGIN_RATINGS.TEXT_VARIABLE
-      help: PLUGIN_RATINGS.TEXT_VARIABLE_HELP
