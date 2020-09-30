@@ -1,4 +1,33 @@
 en:
   PLUGIN_RATINGS:
-    TEXT_VARIABLE: Text Variable
-    TEXT_VARIABLE_HELP: Text to add to the top of a page
+    ADD_RATING: Add a rating
+    RATINGS: Ratings
+    RATING_LABEL: Rating
+    NAME_LABEL: "Name"
+    NAME_PLACEHOLDER: "Enter your name"
+    EMAIL_LABEL: "Email (not published)"
+    EMAIL_PLACEHOLDER: "Enter your email address"
+    MESSAGE_LABEL: "Review"
+    MESSAGE_PLACEHOLDER: "Enter your review"
+    SUBMIT_RATING_BUTTON_TEXT: "Submit"
+    NEW_RATING_EMAIL_SUBJECT: 'New rating on %1$s'
+    WRITTEN_ON: Written on
+    BY: by
+    THANK_YOU_MESSAGE: "Thank you for your rating. Please check your inbox and click on the confirmation link to active your rating."
+
+de:
+  PLUGIN_RATINGS:
+    ADD_RATING: Bewertung verfassen
+    RATINGS: Bewertungen
+    RATING_LABEL: Bewertung
+    NAME_LABEL: "Name"
+    NAME_PLACEHOLDER: "Dein Name"
+    EMAIL_LABEL: "Email (wird nicht veröffentlicht)"
+    EMAIL_PLACEHOLDER: "Deine Email"
+    MESSAGE_LABEL: "Erfahrungsbericht"
+    MESSAGE_PLACEHOLDER: "Dein Erfahrungsbericht"
+    SUBMIT_RATING_BUTTON_TEXT: "Absenden"
+    NEW_RATING_EMAIL_SUBJECT: 'Neue Bewertung: %1$s'
+    WRITTEN_ON: Geschrieben am
+    BY: von
+    THANK_YOU_MESSAGE: "Vielen Dank für deine Bewertung! Wir haben dir soeben eine Bestätigungsemail gesendet. Um deine Bewertung auf der Website anzuzeigen, klicke bitte auf den Bestätigungslink in der E-Mail."
