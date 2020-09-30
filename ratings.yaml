@@ -1,2 +1,96 @@
 enabled: true
-text_var: Custom Text added by the **Ratings** plugin (disable plugin to remove)
+
+# New ratings must be moderated by the admin
+moderation: false
+
+# Make sure a user can only rate on X different pages
+# This is useful to avoid someone rating EVERY page, if that is not desired.
+# Use 0 to diable.
+rating_pages_limit: 0
+
+enable_on_routes:
+  - '/'
+
+disable_on_routes:
+  - ''
+
+form:
+    name: ratings
+    anchor: '#modal-rating'
+
+    fields:
+        # Try to prevent spam by using a honeypot instead of a recaptcha
+        - name: honeypot
+          type: honeypot
+
+        - name: name
+          label: PLUGIN_RATINGS.NAME_LABEL
+          placeholder: PLUGIN_RATINGS.NAME_PLACEHOLDER
+          autocomplete: on
+          type: text
+          validate:
+            required: true
+
+        - name: email
+          label: Email (wird nicht veröffentlicht)
+          placeholder: PLUGIN_RATINGS.EMAIL_PLACEHOLDER
+          type: email
+          validate:
+            required: true
+
+        - name: text
+          label: PLUGIN_RATINGS.MESSAGE_LABEL
+          placeholder: PLUGIN_RATINGS.MESSAGE_PLACEHOLDER
+          type: textarea
+          validate:
+            required: true
+
+        - name: date
+          type: hidden
+          process:
+            fillWithCurrentDateTime: true
+
+        - name: title
+          type: hidden
+          evaluateDefault: grav.page.header.title
+
+        - name: lang
+          type: hidden
+          evaluateDefault: grav.language.getLanguage
+
+        - name: path
+          type: hidden
+          evaluateDefault: grav.uri.path
+
+        - name: rating
+          type: rating
+          label: PLUGIN_RATINGS.RATING_LABEL
+          default: 0
+          validate:
+            min: 1
+            max: 5
+            required: true
+
+#        - name: g-recaptcha-response
+#          label: Captcha
+#          type: captcha
+#          recaptcha_site_key: e32iojeoi32jeoi32jeoij32oiej32oiej3
+#          recaptcha_not_validated: 'Captcha not valid!'
+#          validate:
+#            required: true
+#          process:
+#            ignore: true
+
+    buttons:
+        - type: submit
+          value: PLUGIN_RATINGS.SUBMIT_RATING_BUTTON_TEXT
+
+    process:
+#        - captcha:
+#            recaptcha_secret: ej32oiej23oiej32oijeoi32jeio32je
+        # - email:
+        #     subject: PLUGIN_RATINGS.EMAIL_NEW_RATING_SUBJECT
+        #     body: "{% include 'forms/data.html.twig' %}"
+        - addRating:
+        - message: PLUGIN_RATINGS.THANK_YOU_MESSAGE
+        - reset: true

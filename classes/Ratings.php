@@ -104,7 +104,7 @@ class Ratings
     public function hasReachedRatingLimit($email) {
       // Skip if there is no limit
       // NOTE: Use a simple check (== instead of ===) as the setting may be null.
-      $limit = $this->config->get('voting-limit');
+      $limit = $this->config->get('rating_pages_limit');
       if ($limit == 0) {
           return false;
       }
