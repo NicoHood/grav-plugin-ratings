@@ -1,0 +1,18 @@
+RATINGS{% if enable_ratings_plugin %}
+    {% if ratings|length %}
+
+        <h3>{{'PLUGIN_RATINGS.RATINGS'|t}}</h3>
+
+        <table>
+            {% for rating in ratings|array_reverse %}
+            <tr>
+                <td>
+                    {{ rating.review }}
+                    <br />
+                    {{'PLUGIN_RATINGS.WRITTEN_ON'|t}} {{rating.date|e}} {{'PLUGIN_RATINGS.BY'|t}} {{rating.author}}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endif %}
