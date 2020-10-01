@@ -88,9 +88,9 @@ form:
     process:
 #        - captcha:
 #            recaptcha_secret: ej32oiej23oiej32oijeoi32jeio32je
-        # - email:
-        #     subject: PLUGIN_RATINGS.EMAIL_NEW_RATING_SUBJECT
-        #     body: "{% include 'forms/data.html.twig' %}"
+        - email:
+            subject: PLUGIN_RATINGS.EMAIL_NEW_RATING_SUBJECT
+            body: "{% include 'forms/data.html.twig' %}"
         - addRating:
         - message: PLUGIN_RATINGS.THANK_YOU_MESSAGE
         - reset: true
