@@ -62,24 +62,6 @@ class RatingsPlugin extends Plugin
         };
     }
 
-    /**
-     * Add the rating form information to the page header dynamically
-     *
-     * Used by Form plugin >= 2.0
-     */
-    public function onFormPageHeaderProcessed(Event $event)
-    {
-        $header = $event['header'];
-
-        if ($this->enable) {
-            if (!isset($header->form)) {
-                $header->form = $this->grav['config']->get('plugins.ratings.form');
-            }
-        }
-
-        $event->header = $header;
-    }
-
     public function onTwigSiteVariables() {
         $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
         $this->grav['twig']->twig_vars['ratings'] = $this->fetchRatings();
@@ -90,12 +72,29 @@ class RatingsPlugin extends Plugin
      */
     private function calculateEnable() {
         $uri = $this->grav['uri'];
+        $path = $uri->path();
+        $page = $this->grav['page'];
 
         $disable_on_routes = (array) $this->config->get('plugins.ratings.disable_on_routes');
         $enable_on_routes = (array) $this->config->get('plugins.ratings.enable_on_routes');
+        $enable_on_templates = (array) $this->config->get('plugins.ratings.enable_on_templates');
 
-        $path = $uri->path();
+        // Make sure the page is available and published
+        if(!$page || !$page->published() || !$page->isPage()){
+            return;
+        }
 
+        // TODO merge configs and then also check for the active flag per page
+
+        // Filter page template
+        if (!empty($enable_on_templates)) {
+            if (!in_array($this->grav['page']->template(), $enable_on_templates, true)) {
+              dump('no rating');
+                return;
+            }
+        }
+
+        // Filter page routes
         if (!in_array($path, $disable_on_routes)) {
             if (in_array($path, $enable_on_routes)) {
                 $this->enable = true;
@@ -120,27 +119,41 @@ class RatingsPlugin extends Plugin
             return;
         }
 
-        $this->calculateEnable();
+        // TODO check for routes at a very early state?
 
         $this->enable([
-            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
+            'onPageInitialized' => ['onPageInitialized', 0],
+            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0]
         ]);
-
-        // Enable the main events we are interested in
-        if ($this->enable) {
-            $this->enable([
-                'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
-                'onFormProcessed' => ['onFormProcessed', 0],
-                'onFormPageHeaderProcessed' => ['onFormPageHeaderProcessed', 0],
-                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
-            ]);
-        }
 
         $cache = $this->grav['cache'];
         $uri = $this->grav['uri'];
 
         //init cache id
         $this->ratings_cache_id = md5('ratings-data' . $cache->getKey() . '-' . $uri->url());
+    }
+
+    public function onPageInitialized(Event $event)
+    {
+        // Check if the plugin should be enabled.
+        // We need to check this in the page initialized event
+        // in order to access the page template property.
+        $this->calculateEnable();
+
+        // Enable the main events we are interested in
+        if ($this->enable) {
+            // NOTE: We must add the form here and not in the onFormPageHeaderProcessed event.
+            // The mentioned event will run before onPageInitialized, but we can only validate
+            // the page template filters after the page got initialized. Thatswhy the form will be
+            // added at this later stage.
+            $this->grav['page']->addForms([$this->grav['config']->get('plugins.ratings.form')]);
+
+            $this->enable([
+                'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
+                'onFormProcessed' => ['onFormProcessed', 0],
+                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            ]);
+        }
     }
 
     /**

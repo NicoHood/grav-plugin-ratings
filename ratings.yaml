@@ -8,11 +8,15 @@ moderation: false
 # Use 0 to diable.
 rating_pages_limit: 0
 
+# Add one or multiple templates that the page must match.
+# This can be used to only rate blog posts for example.
+enable_on_templates:
+# - 'blog'
+
 enable_on_routes:
   - '/'
 
 disable_on_routes:
-  - ''
 
 form:
     name: ratings
