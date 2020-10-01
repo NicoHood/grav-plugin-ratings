@@ -10,7 +10,7 @@ en:
     MESSAGE_LABEL: "Review"
     MESSAGE_PLACEHOLDER: "Enter your review"
     SUBMIT_RATING_BUTTON_TEXT: "Submit"
-    NEW_RATING_EMAIL_SUBJECT: 'New rating on %1$s'
+    EMAIL_NEW_RATING_SUBJECT: "[New Rating] from {{ form.value.name|e }}"
     WRITTEN_ON: Written on
     BY: by
     THANK_YOU_MESSAGE: "Thank you for your rating. Please check your inbox and click on the confirmation link to active your rating."
@@ -27,7 +27,7 @@ de:
     MESSAGE_LABEL: "Erfahrungsbericht"
     MESSAGE_PLACEHOLDER: "Dein Erfahrungsbericht"
     SUBMIT_RATING_BUTTON_TEXT: "Absenden"
-    NEW_RATING_EMAIL_SUBJECT: 'Neue Bewertung: %1$s'
+    EMAIL_NEW_RATING_SUBJECT: '[Neue Bewertung] von {{ form.value.name|e }}'
     WRITTEN_ON: Geschrieben am
     BY: von
     THANK_YOU_MESSAGE: "Vielen Dank für deine Bewertung! Wir haben dir soeben eine Bestätigungsemail gesendet. Um deine Bewertung auf der Website anzuzeigen, klicke bitte auf den Bestätigungslink in der E-Mail."
