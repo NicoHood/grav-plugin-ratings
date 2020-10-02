@@ -51,22 +51,30 @@ class Ratings
 
     public function addRating(int $rating, string $page, string $email, string $author, string $review) {
 
-        // TODO check if adding this rating is even allowed (check voting limits)
+        // TODO check if adding this rating is even allowed (check voting limits) (but already done in onFormValidationProcessed)
 
         $lang = $this->grav['language']->getLanguage();
 
         // Generate a new token for email verification
-        $activation_token = NULL;
+        $token = NULL;
+        $expire = NULL;
         if ($this->config->get('email_verification', false)) {
             $token = md5(uniqid(mt_rand(), true));
-            $expire = time() + $this->config->get('activation_token_expire_time', 604800);
-            $activation_token = $token . '::' . $expire;
+
+            // Do not calculate an expire date if unlimited expire time was choosen (expire time is 0)
+            $expire_time = (int) $this->config->get('activation_token_expire_time', 604800);
+            if ($expire_time === 0) {
+                $expire = 0;
+            }
+            else {
+                $expire = time() + $expire_time;
+            }
         }
 
         $query = "INSERT INTO {$this->table_ratings}
-          (page, rating, email, author, review, date, lang, token)
+          (page, rating, email, author, review, date, lang, token, expire)
           VALUES
-          (:page, :rating, :email, :author, :review, datetime('now', 'localtime'), :lang, :token)";
+          (:page, :rating, :email, :author, :review, datetime('now', 'localtime'), :lang, :token, :expire)";
 
         $statement = $this->db->prepare($query);
         $statement->bindValue(':rating', $rating, PDO::PARAM_INT);
@@ -75,13 +83,52 @@ class Ratings
         $statement->bindValue(':author', $author, PDO::PARAM_STR);
         $statement->bindValue(':review', $review, PDO::PARAM_STR);
         $statement->bindValue(':lang', $lang, PDO::PARAM_STR);
-        $statement->bindValue(':token', $activation_token, PDO::PARAM_STR);
+        $statement->bindValue(':token', $token, PDO::PARAM_STR);
+        $statement->bindValue(':expire', $expire, PDO::PARAM_STR);
 
         $statement->execute();
 
-        if($activation_token) {
-            $this->sendActivationEmail($email, $token, $author);
+        if($token) {
+            $this->sendActivationEmail($email, $token, $author, $review);
         }
+    }
+
+    public function getRatingByToken(string $token) {
+        $query = "SELECT token, expire, page, email, author FROM {$this->table_ratings} WHERE token = :token";
+        $statement = $this->db->prepare($query);
+        $statement->bindValue(':token', $token, PDO::PARAM_STR);
+        $statement->execute();
+
+        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if(count($results) > 1) {
+            throw new \RuntimeException($this->language->translate('PLUGIN_RATINGS.MULTIPLE_TOKENS_FAILURE'));
+        }
+
+        if(count($results) < 1) {
+            throw new \RuntimeException($this->language->translate('PLUGIN_RATINGS.TOKEN_NOT_FOUND'));
+        }
+        return $results[0];
+    }
+
+    public function activateRating(string $token) {
+        // Set token expire date to NULL to flag it as valid/activated
+        $query = "UPDATE {$this->table_ratings}
+          SET expire = NULL
+          WHERE token = :token";
+        $statement = $this->db->prepare($query);
+        $statement->bindValue(':token', $token, PDO::PARAM_STR);
+        $statement->execute();
+    }
+
+    public function removeInactivatedRatings(string $page) {
+        // If there are other ratings on the same page/email with pending tokens, delete them now.
+        $query = "DELETE FROM {$this->table_ratings}
+          WHERE page = :page
+          AND expire IS NOT NULL";
+        $statement = $this->db->prepare($query);
+        $statement->bindValue(':page', $page, PDO::PARAM_STR);
+        $statement->execute();
     }
 
     /**
@@ -128,8 +175,14 @@ class Ratings
         return true;
     }
 
+    // Make sure to only count activated tokens (expire == NULL)
+    // If a rating was not yet verified,
+    // treat this as if the user did not vote on this page.
     public function getRatings(string $page, int $rating = NULL) {
-        $query = "SELECT rating, page, email, author, review, date, moderated FROM {$this->table_ratings} WHERE page = :page";
+        $query = "SELECT rating, page, email, author, review, date, moderated
+          FROM {$this->table_ratings}
+          WHERE page = :page
+          AND expire IS NULL";
 
         if (null !== $rating) {
             $query .= ' AND rating = :rating';
@@ -151,7 +204,15 @@ class Ratings
     }
 
     public function hasAlreadyRated($page, $email) {
-        $query = "SELECT EXISTS(SELECT 1 FROM {$this->table_ratings} WHERE page = :page AND email = :email LIMIT 1)";
+        // Make sure to only count activated tokens (expire is NULL)
+        // If a rating was not yet verified,
+        // treat this as if the user did not vote on this page.
+        $query = "SELECT EXISTS(
+          SELECT 1 FROM {$this->table_ratings}
+          WHERE page = :page
+          AND email = :email
+          AND expire IS NULL
+          LIMIT 1)";
         $statement = $this->db->prepare($query);
         $statement->bindValue(':page', $page, PDO::PARAM_STR);
         $statement->bindValue(':email', $email, PDO::PARAM_STR);
@@ -171,7 +232,13 @@ class Ratings
           return false;
       }
 
-      $query = "SELECT COUNT(DISTINCT page) FROM {$this->table_ratings} WHERE email = :email";
+      // Make sure to only count activated tokens (expire is NULL)
+      // If a rating was not yet verified,
+      // treat this as if the user did not vote on this page.
+      $query = "SELECT COUNT(DISTINCT page)
+        FROM {$this->table_ratings}
+        WHERE email = :email
+        AND expire is NULL";
       $statement = $this->db->prepare($query);
       $statement->bindValue(':email', $email, PDO::PARAM_STR);
       $statement->execute();
@@ -187,19 +254,22 @@ class Ratings
         $commands = [
             // NOTE: Autoincrement is somehow special in sqlite:
             // https://stackoverflow.com/questions/7905859/is-there-an-auto-increment-in-sqlite
+            // NOTE: If expire is NULL the rating is activated. If expire is 0, the token will never expire.
             "CREATE TABLE IF NOT EXISTS {$this->table_ratings} (
               id INTEGER,
-              page VARCHAR(255),
-              rating INTEGER DEFAULT 0,
+              page VARCHAR(255) NOT NULL,
+              rating INTEGER DEFAULT 0 NOT NULL,
               email VARCHAR(255),
               author VARCHAR(255),
               review TEXT,
               date TEXT,
               lang VARCHAR(255),
               token VARCHAR(255),
+              expire INTEGER,
               moderated BOOL DEFAULT TRUE,
               PRIMARY KEY (id))",
         ];
+        // TODO add SQL CONSTRAINT to limit ratings to 1-5? -> use config value
 
         // execute the sql commands to create new tables
         foreach ($commands as $command) {

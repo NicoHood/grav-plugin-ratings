@@ -22,9 +22,10 @@ disable_on_routes:
 # that must be clicked before the rating goes online.
 email_verification: false
 
-# Time in seconds when the activation token should expire (Default 1 Week)
-activation_token_expire_time: 604800
+# Time in seconds when the activation token should expire (Default 1 Week), 0 Means Tokens never expire
+activation_token_expire_time: 0
 route_activate: '/activate-rating'
+send_confirmation_email: false
 
 form:
     name: ratings

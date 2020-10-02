@@ -23,6 +23,12 @@ en:
     ACTIVATION_EMAIL_BODY: "<h1>Rating Activation</h1><p>Hi %1$s, </p><p>Thank you very much for your rating on the website <b>%3$s</b>. To activate your rating on the website, please confirm it by clicking on the activation link.</p><p><br/><a href=\"%2$s\" class=\"btn-primary\">Activate Your Rating Now</a><br/><br/></p><p>Alternatively, copy the following URL into your browser's address bar:</p><p class=\"word-break\"><a href=\"%2$s\">%2$s</a></p><p><br/>Kind regards,<br/><br/>%4$s</p>"
     EMAIL_SENDING_FAILURE: "An error occurred while sending the activation email."
     ACTIVATION_EMAIL_PARAM_FAILURE: "An error occurred while preparing the activation email."
+    INVALID_REQUEST: "Invalid request"
+    MULTIPLE_TOKENS_FAILURE: "Token exists multiple times."
+    TOKEN_NOT_FOUND: "Token not found."
+    ACTIVATION_SUCCESS: "Rating successfully activated."
+    TOKEN_EXPIRED: "Token expired."
+    RATING_ALREADY_ACTIVATED: "Rating was already activated."
 
 de:
   PLUGIN_RATINGS:
@@ -49,3 +55,9 @@ de:
     ACTIVATION_EMAIL_BODY: "<h1>Bewertung aktivieren</h1><p>Hallo %1$s, </p><p>Vielen Dank für deine Bewertung auf der Website <a href=\"%5$s\">%3$s</a>. Um deine Bewertung auf der Website freizuschalten, bestätige sie bitte mir einem Klick auf den Aktivierungslink.</p><p><br/><a href=\"%2$s\" class=\"btn-primary\">Bewertung jetzt aktivieren</a><br/><br/></p><p>Alternativ kopiere die folgende URL in die Adressleiste deines Browsers:</p><p class=\"word-break\"><a href=\"%2$s\">%2$s</a></p><p><br/>Mit freundlichen Grüßen,<br/><br/>%4$s</p>"
     EMAIL_SENDING_FAILURE: "Beim Senden der Aktivierungs-E-Mail ist ein Fehler aufgetreten."
     ACTIVATION_EMAIL_PARAM_FAILURE: "Bei der Vorbereitung der Aktivierungs-E-Mail ist ein Fehler aufgetreten."
+    INVALID_REQUEST: "Ungültige Anfrage."
+    MULTIPLE_TOKENS_FAILURE: "Token existiert mehrfach."
+    TOKEN_NOT_FOUND: "Ungültiger Token."
+    ACTIVATION_SUCCESS: "Bewertung erfolgreich aktiviert."
+    TOKEN_EXPIRED: "Token abgelaufen."
+    RATING_ALREADY_ACTIVATED: "Diese Bewertung wurde bereits erfolgreich aktiviert."

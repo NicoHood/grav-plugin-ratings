@@ -121,9 +121,17 @@ class RatingsPlugin extends Plugin
         // TODO check for routes at a very early state?
 
         $this->enable([
-            'onPageInitialized' => ['onPageInitialized', 0],
+            'onPageInitialized' => ['onPageInitialized', 1000],
             'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0]
         ]);
+
+        // Handle activation token links
+        $path = $this->grav['uri']->path();
+        if ($path === $this->config->get('plugins.ratings.route_activate')) {
+            $this->enable([
+                'onPagesInitialized' => ['handleRatingActivation', 0],
+            ]);
+        }
 
         $cache = $this->grav['cache'];
         $uri = $this->grav['uri'];
@@ -323,5 +331,66 @@ class RatingsPlugin extends Plugin
     public function onTwigTemplatePaths()
     {
         $this->grav['twig']->twig_paths[] = __DIR__ . '/templates';
+    }
+
+
+    /**
+     * Handle rating activation
+     * @throws \RuntimeException
+     */
+    public function handleRatingActivation()
+    {
+        /** @var Uri $uri */
+        $uri = $this->grav['uri'];
+
+        /** @var Message $messages */
+        $messages = $this->grav['messages'];
+
+        // URL Parameter
+        $token = $uri->param('token');
+
+        try {
+            $rating = $this->grav['ratings']->getRatingByToken($token);
+        } catch (\RuntimeException $e) {
+            $messages->add($e->getMessage(), 'error');
+            return;
+        }
+        $page = $rating['page'];
+
+        // Check for 0 or NULL (Rating already verified or no token verification used at all)
+        if ($rating['expire'] == NULL) {
+            $message = $this->grav['language']->translate('PLUGIN_RATINGS.RATING_ALREADY_ACTIVATED');
+            $messages->add($message, 'warning');
+        }
+        else if ($this->grav['ratings']->hasAlreadyRated($page, $rating['email'])) {
+            $message = $this->grav['language']->translate('PLUGIN_RATINGS.ALREADY_RATED');
+            $messages->add($message, 'warning');
+        }
+        else {
+            // Check if token expired. 0 Means unlimited expire time (tokens never expire)
+            if ((int)$rating['expire'] !== 0 && time() > (int)$rating['expire']) {
+                $message = $this->grav['language']->translate('PLUGIN_RATINGS.TOKEN_EXPIRED');
+                $messages->add($message, 'error');
+            }
+            else {
+
+                $this->grav['ratings']->activateRating($token);
+                // TODO remove not required tokens? We could still use them to display better error messages
+                //$this->grav['ratings']->removeInactivatedRatings($page);
+
+                // TODO implement
+                // if ($this->config->get('plugins.ratings.send_confirmation_email', false)) {
+                //     $this->grav['ratings']->sendConfirmationEmail();
+                // }
+
+                $message = $this->grav['language']->translate('PLUGIN_RATINGS.ACTIVATION_SUCCESS');
+                $messages->add($message, 'info');
+            }
+        }
+
+        // Redirect to the rated page
+        $redirect_route = $page;
+        $redirect_code = null;
+        $this->grav->redirectLangSafe($redirect_route ?: '/', $redirect_code);
     }
 }
