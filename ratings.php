@@ -163,6 +163,8 @@ class RatingsPlugin extends Plugin
      */
     public function onFormValidationProcessed(Event $event)
     {
+        $language = $this->grav['language'];
+
         // Special check for rating field
         foreach ($event['form']->fields() as $field) {
             if ($field['type'] === 'rating') {
@@ -173,16 +175,16 @@ class RatingsPlugin extends Plugin
 
                 // Check if the data is an integer
                 if($rating === false) {
-                    throw new ValidationException('Invalid rating passed.');
+                    throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING'));
                 }
 
                 // Validate minimum and maximum settings
                 if(isset($field['validate'])) {
                     if(isset($field['validate']['min']) && $rating < $field['validate']['min']) {
-                        throw new ValidationException('Rating is below minimum.');
+                        throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING_MIN'));
                     }
                     if(isset($field['validate']['max']) && $rating > $field['validate']['max']) {
-                        throw new ValidationException('Rating is above maximum.');
+                        throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING_MAX'));
                     }
                 }
             }
@@ -202,11 +204,11 @@ class RatingsPlugin extends Plugin
 
         // Check if user voted for this special page already
         if ($this->grav['ratings']->hasAlreadyRated($path, $email)) {
-            throw new ValidationException('You have already voted for this post.');
+            throw new ValidationException($language->translate('PLUGIN_RATINGS.ALREADY_RATED'));
         }
 
         if ($this->grav['ratings']->hasReachedRatingLimit($email)) {
-            throw new ValidationException('You have already voted on too many topics.');
+            throw new ValidationException($language->translate('PLUGIN_RATINGS.REACHED_RATING_LIMIT'));
         }
     }
 
