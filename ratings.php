@@ -89,7 +89,6 @@ class RatingsPlugin extends Plugin
         // Filter page template
         if (!empty($enable_on_templates)) {
             if (!in_array($this->grav['page']->template(), $enable_on_templates, true)) {
-              dump('no rating');
                 return;
             }
         }

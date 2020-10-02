@@ -18,6 +18,14 @@ enable_on_routes:
 
 disable_on_routes:
 
+# Send an email to the user with a verification link
+# that must be clicked before the rating goes online.
+email_verification: false
+
+# Time in seconds when the activation token should expire (Default 1 Week)
+activation_token_expire_time: 604800
+route_activate: '/activate-rating'
+
 form:
     name: ratings
     anchor: '#modal-rating'

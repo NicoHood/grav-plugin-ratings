@@ -6,11 +6,15 @@ use Grav\Common\Filesystem\Folder;
 use Grav\Common\Grav;
 use Grav\Common\Config\Config;
 use Grav\Plugin\Database\PDO;
+use Grav\Plugin\Email\Utils as EmailUtils;
 
 class Ratings
 {
-    // Grav instance
-    private $grav;
+    /** @var Grav */
+    protected $grav;
+
+    /** @var Language $language */
+    protected $language;
 
     /** @var PDO */
     protected $db;
@@ -25,6 +29,7 @@ class Ratings
     public function __construct($config)
     {
         $this->grav = Grav::instance();
+        $this->language = $this->grav['language'];
 
         $this->config = new Config($config);
         $db_path = $this->grav['locator']->findResource($this->path, true, true);
@@ -44,16 +49,24 @@ class Ratings
         }
     }
 
-    public function addRating($rating, $page, $email, $author, $review) {
+    public function addRating(int $rating, string $page, string $email, string $author, string $review) {
 
         // TODO check if adding this rating is even allowed (check voting limits)
 
         $lang = $this->grav['language']->getLanguage();
 
+        // Generate a new token for email verification
+        $activation_token = NULL;
+        if ($this->config->get('email_verification', false)) {
+            $token = md5(uniqid(mt_rand(), true));
+            $expire = time() + $this->config->get('activation_token_expire_time', 604800);
+            $activation_token = $token . '::' . $expire;
+        }
+
         $query = "INSERT INTO {$this->table_ratings}
-          (page, rating, email, author, review, date, lang)
+          (page, rating, email, author, review, date, lang, token)
           VALUES
-          (:page, :rating, :email, :author, :review, datetime('now', 'localtime'), :lang)";
+          (:page, :rating, :email, :author, :review, datetime('now', 'localtime'), :lang, :token)";
 
         $statement = $this->db->prepare($query);
         $statement->bindValue(':rating', $rating, PDO::PARAM_INT);
@@ -62,11 +75,60 @@ class Ratings
         $statement->bindValue(':author', $author, PDO::PARAM_STR);
         $statement->bindValue(':review', $review, PDO::PARAM_STR);
         $statement->bindValue(':lang', $lang, PDO::PARAM_STR);
+        $statement->bindValue(':token', $activation_token, PDO::PARAM_STR);
 
         $statement->execute();
+
+        if($activation_token) {
+            $this->sendActivationEmail($email, $token, $author);
+        }
     }
 
-    public function getRatings($page, $rating = NULL) {
+    /**
+     * Handle the email to activate the user rating.
+     *
+     * @param string $email
+     * @param string $token
+     * @param string $name
+     *
+     * @return bool True if the action was performed.
+     * @throws \RuntimeException
+     */
+    protected function sendActivationEmail(string $email, string $token, string $name)
+    {
+        if (empty($email) || empty($token) || empty($name)) {
+            throw new \RuntimeException($this->language->translate('PLUGIN_RATINGS.ACTIVATION_EMAIL_PARAM_FAILURE'));
+        }
+
+        // Make sure to use the system wide and not the plugin configuration
+        $system_config = $this->grav['config'];
+        $param_sep = $system_config->get('system.param_sep', ':');
+        $activation_link = $this->grav['base_url_absolute'] . $this->config->get('route_activate') . '/token' . $param_sep . $token;
+
+        $site_name = $system_config->get('site.title', 'Website');
+        $site_link = $this->grav['base_url_absolute'];
+        $author = $system_config->get('site.author.name', '');
+        $fullname = $name;
+
+        $subject = $this->language->translate(['PLUGIN_RATINGS.ACTIVATION_EMAIL_SUBJECT', $site_name]);
+        $content = $this->language->translate(['PLUGIN_RATINGS.ACTIVATION_EMAIL_BODY',
+            $fullname,
+            $activation_link,
+            $site_name,
+            $author,
+            $site_link
+        ]);
+        $to = $email;
+        $sent = EmailUtils::sendEmail($subject, $content, $to);
+
+        if ($sent < 1) {
+            throw new \RuntimeException($this->language->translate('PLUGIN_RATINGS.EMAIL_SENDING_FAILURE'));
+        }
+
+        return true;
+    }
+
+    public function getRatings(string $page, int $rating = NULL) {
         $query = "SELECT rating, page, email, author, review, date, moderated FROM {$this->table_ratings} WHERE page = :page";
 
         if (null !== $rating) {
@@ -131,9 +193,10 @@ class Ratings
               rating INTEGER DEFAULT 0,
               email VARCHAR(255),
               author VARCHAR(255),
-              lang VARCHAR(255),
               review TEXT,
               date TEXT,
+              lang VARCHAR(255),
+              token VARCHAR(255),
               moderated BOOL DEFAULT TRUE,
               PRIMARY KEY (id))",
         ];
