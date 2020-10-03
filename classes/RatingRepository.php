@@ -26,9 +26,11 @@ class RatingRepository
     }
 
     public function create(Rating $rating) : Rating {
-        // If the ID is set, we're updating an existing record
+        // If the ID is set, flag this as error
         if (isset($rating->id)) {
-            return $rating->update($user);
+            throw new \LogicException(
+                'Rating already with this id exists.'
+            );
         }
 
         // TODO date currently set automatically
