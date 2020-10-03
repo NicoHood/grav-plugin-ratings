@@ -174,7 +174,7 @@ class Ratings
         $rating->email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
         $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
         $rating->moderated = !$this->grav['config']->get('moderation');
-        $rating->lang = $this->grav['language']->getLanguage();
+        $rating->lang = $this->language->getLanguage();
         // TODO date currently set automatically
 
         // Get email and author from grav login (ignore POST data)
