@@ -244,7 +244,8 @@ class RatingsPlugin extends Plugin
                 $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-                $rating = (int) filter_var(urldecode($post['rating']), FILTER_SANITIZE_NUMBER_INT);
+                // TODO rename form param to stars
+                $stars = (int) filter_var(urldecode($post['rating']), FILTER_SANITIZE_NUMBER_INT);
 
                 $moderated = 0;
                 if (!$this->grav['config']->get('plugins.ratings.moderation')) {
@@ -259,7 +260,13 @@ class RatingsPlugin extends Plugin
                     }
                 }
 
-                $this->grav['ratings']->addRating($rating, $path, $email, $name, $text);
+                // Check if there is currently a not yet verified rating and invalidate those
+                $existingRatings = $this->grav['ratings']->getRating($path, $email);
+                foreach ($existingRatings as $rating) {
+                    $this->grav['ratings']->expireRating($rating);
+                }
+
+                $this->grav['ratings']->addRating($stars, $path, $email, $name, $text);
 
                 // Clear cache
                 $this->grav['cache']->delete($this->ratings_cache_id);
@@ -355,26 +362,25 @@ class RatingsPlugin extends Plugin
             $messages->add($e->getMessage(), 'error');
             return;
         }
-        $page = $rating['page'];
 
         // Check for 0 or NULL (Rating already verified or no token verification used at all)
-        if ($rating['expire'] == NULL) {
+        if ($rating->token_activated()) {
             $message = $this->grav['language']->translate('PLUGIN_RATINGS.RATING_ALREADY_ACTIVATED');
             $messages->add($message, 'warning');
         }
-        else if ($this->grav['ratings']->hasAlreadyRated($page, $rating['email'])) {
+        else if ($this->grav['ratings']->hasAlreadyRated($rating->page, $rating->email)) {
             $message = $this->grav['language']->translate('PLUGIN_RATINGS.ALREADY_RATED');
             $messages->add($message, 'warning');
         }
         else {
             // Check if token expired. 0 Means unlimited expire time (tokens never expire)
-            if ((int)$rating['expire'] !== 0 && time() > (int)$rating['expire']) {
+            if ($rating->token_expired()) {
                 $message = $this->grav['language']->translate('PLUGIN_RATINGS.TOKEN_EXPIRED');
                 $messages->add($message, 'error');
             }
             else {
 
-                $this->grav['ratings']->activateRating($token);
+                $this->grav['ratings']->activateRating($rating);
                 // TODO remove not required tokens? We could still use them to display better error messages
                 //$this->grav['ratings']->removeInactivatedRatings($page);
 
@@ -389,7 +395,7 @@ class RatingsPlugin extends Plugin
         }
 
         // Redirect to the rated page
-        $redirect_route = $page;
+        $redirect_route = $rating->page;
         $redirect_code = null;
         $this->grav->redirectLangSafe($redirect_route ?: '/', $redirect_code);
     }

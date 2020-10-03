@@ -9,7 +9,7 @@
         {# Calculate average and average rounded to the next half star (e.g. 3.3 -> 3.5) #}
         {% set sumratings = 0 %}
         {% for rating in ratings %}
-          {% set sumratings = sumratings + rating.rating %}
+          {% set sumratings = sumratings + rating.stars %}
         {% endfor %}
         {% set rating_avg = rating_count == 0 ? 0 : (sumratings / rating_count)|round(1) %}
         {% set rating_avg_half_star = rating_count == 0 ? 0 : ((rating_avg) * 2)|round / 2 %}
@@ -19,7 +19,7 @@
 
             <div class="rating-scorecard">
               {% for rating_number in rating_max .. rating_min %}
-                {% set rating_number_count = ratings|filter(x => x.rating == rating_number)|length %}
+                {% set rating_number_count = ratings|filter(x => x.stars == rating_number)|length %}
                 <div class="rating-scorecard-item columns">
                   <div class="column col-3">
                     <div>

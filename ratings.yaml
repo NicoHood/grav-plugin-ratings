@@ -23,7 +23,7 @@ disable_on_routes:
 email_verification: false
 
 # Time in seconds when the activation token should expire (Default 1 Week), 0 Means Tokens never expire
-activation_token_expire_time: 0
+activation_token_expire_time: 604800
 route_activate: '/activate-rating'
 send_confirmation_email: false
 
