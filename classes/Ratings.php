@@ -6,6 +6,7 @@ namespace Grav\Plugin\Ratings;
 
 use Grav\Common\Grav;
 use Grav\Common\Config\Config;
+use Grav\Common\Filesystem\Folder;
 use Grav\Plugin\Database\PDO;
 use Grav\Plugin\Email\Utils as EmailUtils;
 
