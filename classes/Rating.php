@@ -6,7 +6,7 @@ namespace Grav\Plugin\Ratings;
 
 class Rating
 {
-    public int $id;
+    public ?int $id = null;
     public string $page;
     public string $email;
     public string $author;

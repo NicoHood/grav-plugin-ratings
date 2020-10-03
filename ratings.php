@@ -8,6 +8,7 @@ use RocketTheme\Toolbox\Event\Event;
 use Grav\Common\Data\ValidationException;
 use Grav\Plugin\Database\PDO;
 use Grav\Plugin\Ratings\Ratings;
+use Grav\Plugin\Ratings\Rating;
 
 /**
  * Class RatingsPlugin
@@ -173,7 +174,7 @@ class RatingsPlugin extends Plugin
         $language = $this->grav['language'];
 
         // Special check for rating field
-        foreach ($event['form']->fields() as $field) {
+        foreach ($event['form']->getFields() as $field) {
             if ($field['type'] === 'rating') {
                 // Get POST data and convert string to int
                 $raw_data = $event['form']->value($field['name']);
@@ -198,23 +199,14 @@ class RatingsPlugin extends Plugin
         }
 
         // Validate if user is allowed to rate
-        $post = isset($_POST['data']) ? $_POST['data'] : [];
-        $path = $this->grav['uri']->path();
-        $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-
-        if (isset($this->grav['user'])) {
-            $user = $this->grav['user'];
-            if ($user->authenticated) {
-                $email = $user->email;
-            }
-        }
+        $rating = $this->grav['ratings']->getRatingFromPost($event['form']->data());
 
         // Check if user voted for this special page already
-        if ($this->grav['ratings']->hasAlreadyRated($path, $email)) {
+        if ($this->grav['ratings']->hasAlreadyRated($rating)) {
             throw new ValidationException($language->translate('PLUGIN_RATINGS.ALREADY_RATED'));
         }
 
-        if ($this->grav['ratings']->hasReachedRatingLimit($email)) {
+        if ($this->grav['ratings']->hasReachedRatingLimit($rating->email)) {
             throw new ValidationException($language->translate('PLUGIN_RATINGS.REACHED_RATING_LIMIT'));
         }
     }
@@ -236,36 +228,15 @@ class RatingsPlugin extends Plugin
 
         switch ($action) {
             case 'addRating':
-                $post = isset($_POST['data']) ? $_POST['data'] : [];
-
-                $path = $this->grav['uri']->path();
-                $title = $this->grav['page']->title();
-
-                $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
-                $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
-                $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-                $stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
-
-                $moderated = 0;
-                if (!$this->grav['config']->get('plugins.ratings.moderation')) {
-                    $moderated = 1;
-                }
-
-                if (isset($this->grav['user'])) {
-                    $user = $this->grav['user'];
-                    if ($user->authenticated) {
-                        $name = $user->fullname;
-                        $email = $user->email;
-                    }
-                }
+                $rating = $this->grav['ratings']->getRatingFromPost($event['form']->data());
 
                 // Check if there is currently a not yet verified rating and invalidate those
-                $existingRatings = $this->grav['ratings']->getRating($path, $email);
-                foreach ($existingRatings as $rating) {
-                    $this->grav['ratings']->expireRating($rating);
+                $existingRatings = $this->grav['ratings']->getRating($rating->page, $rating->email);
+                foreach ($existingRatings as $existingRating) {
+                    $this->grav['ratings']->expireRating($existingRating);
                 }
 
-                $this->grav['ratings']->addRating($stars, $path, $email, $name, $text);
+                $this->grav['ratings']->addRating($rating);
 
                 // Clear cache
                 $this->grav['cache']->delete($this->ratings_cache_id);
@@ -367,7 +338,7 @@ class RatingsPlugin extends Plugin
             $message = $this->grav['language']->translate('PLUGIN_RATINGS.RATING_ALREADY_ACTIVATED');
             $messages->add($message, 'warning');
         }
-        else if ($this->grav['ratings']->hasAlreadyRated($rating->page, $rating->email)) {
+        else if ($this->grav['ratings']->hasAlreadyRated($rating)) {
             $message = $this->grav['language']->translate('PLUGIN_RATINGS.ALREADY_RATED');
             $messages->add($message, 'warning');
         }

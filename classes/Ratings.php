@@ -55,21 +55,7 @@ class Ratings
         $this->rating_repository = new RatingRepository($this->grav['database'], $connect_string);
     }
 
-    public function addRating(int $stars, string $page, string $email, string $author, string $review) {
-        $rating = new Rating();
-        $rating->stars = $stars;
-        $rating->page = $page;
-        $rating->email = $email;
-        $rating->author = $author;
-        $rating->review = $review;
-
-        $rating->lang = $this->grav['language']->getLanguage();
-
-        $expire_time = (int) $this->config->get('activation_token_expire_time', 604800);
-        $rating->set_expire_time($expire_time);
-
-        // TODO date currently set automatically
-
+    public function addRating(Rating $rating) {
         $this->rating_repository->create($rating);
 
         if($rating->token) {
@@ -190,7 +176,10 @@ class Ratings
         return $results;
     }
 
-    public function hasAlreadyRated($page, $email) {
+    public function hasAlreadyRated(Rating $rating) : bool {
+        $page = $rating->page;
+        $email = $rating->email;
+
         // Make sure to only count activated tokens (expire is NULL)
         // If a rating was not yet verified,
         // treat this as if the user did not vote on this page.
@@ -211,28 +200,58 @@ class Ratings
         return $result == "1" ? true : false;
     }
 
-    public function hasReachedRatingLimit($email) {
-      // Skip if there is no limit
-      // NOTE: Use a simple check (== instead of ===) as the setting may be null.
-      $limit = $this->config->get('rating_pages_limit');
-      if ($limit == 0) {
-          return false;
-      }
+    public function hasReachedRatingLimit($email) : bool {
+        // Skip if there is no limit
+        // NOTE: Use a simple check (== instead of ===) as the setting may be null.
+        $limit = $this->config->get('rating_pages_limit');
+        if ($limit == 0) {
+            return false;
+        }
 
-      // Make sure to only count activated tokens (expire is NULL)
-      // If a rating was not yet verified,
-      // treat this as if the user did not vote on this page.
-      $query = "SELECT COUNT(DISTINCT page)
-        FROM {$this->table_ratings}
-        WHERE email = :email
-        AND expire is NULL";
-      $statement = $this->db->prepare($query);
-      $statement->bindValue(':email', $email, PDO::PARAM_STR);
-      $statement->execute();
-      $result = $statement->fetchColumn();
+        // Make sure to only count activated tokens (expire is NULL)
+        // If a rating was not yet verified,
+        // treat this as if the user did not vote on this page.
+        $query = "SELECT COUNT(DISTINCT page)
+          FROM {$this->table_ratings}
+          WHERE email = :email
+          AND expire is NULL";
+        $statement = $this->db->prepare($query);
+        $statement->bindValue(':email', $email, PDO::PARAM_STR);
+        $statement->execute();
+        $result = $statement->fetchColumn();
 
-      // NOTE: we are doing a lazy check here (>= instead of >==),
-      // as the database will return a string instead of an int.
-      return $result >= $limit ? true : false;
+        // NOTE: we are doing a lazy check here (>= instead of >==),
+        // as the database will return a string instead of an int.
+        return $result >= $limit ? true : false;
+    }
+
+    // $post should be from $event['form']->data()
+    // TODO test what happens if some post data is missing
+    public function getRatingFromPost($post) : Rating {
+        $rating = new Rating();
+
+        $rating->page = $this->grav['uri']->path();
+        $rating->review = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
+        $rating->author = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
+        $rating->email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
+        $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
+        $rating->moderated = !$this->grav['config']->get('moderation');
+        $rating->lang = $this->grav['language']->getLanguage();
+        // TODO date currently set automatically
+
+        // Get email and author from grav login (ignore POST data)
+        if (isset($this->grav['user'])) {
+            $user = $this->grav['user'];
+            if ($user->authenticated) {
+                $rating->author = $user->fullname;
+                $rating->email = $user->email;
+            }
+        }
+
+        // Calculate expire date
+        $expire_time = (int) $this->config->get('activation_token_expire_time', 604800);
+        $rating->set_expire_time($expire_time);
+
+        return $rating;
     }
 }
