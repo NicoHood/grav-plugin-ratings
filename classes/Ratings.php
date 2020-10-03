@@ -227,7 +227,7 @@ class Ratings
 
     // $post should be from $event['form']->data()
     // TODO test what happens if some post data is missing
-    public function getRatingFromPost($post) : Rating {
+    public function getRatingFromPostData($post) : Rating {
         $rating = new Rating();
 
         $rating->page = $this->grav['uri']->path();

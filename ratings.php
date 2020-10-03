@@ -199,7 +199,7 @@ class RatingsPlugin extends Plugin
         }
 
         // Validate if user is allowed to rate
-        $rating = $this->grav['ratings']->getRatingFromPost($event['form']->data());
+        $rating = $this->grav['ratings']->getRatingFromPostData($event['form']->data());
 
         // Check if user voted for this special page already
         if ($this->grav['ratings']->hasAlreadyRated($rating)) {
@@ -228,7 +228,7 @@ class RatingsPlugin extends Plugin
 
         switch ($action) {
             case 'addRating':
-                $rating = $this->grav['ratings']->getRatingFromPost($event['form']->data());
+                $rating = $this->grav['ratings']->getRatingFromPostData($event['form']->data());
 
                 // Check if there is currently a not yet verified rating and invalidate those
                 $existingRatings = $this->grav['ratings']->getRating($rating->page, $rating->email);
