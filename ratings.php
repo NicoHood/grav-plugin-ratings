@@ -34,8 +34,8 @@ class RatingsPlugin extends Plugin
         return [
             'onPluginsInitialized' => [
                 ['autoload', 100000], // TODO: Remove when plugin requires Grav >=1.7
-                ['onPluginsInitialized', 1000],
-                ['register', 1000]
+                ['register', 1000],
+                ['onPluginsInitialized', 1000]
             ]
         ];
     }
@@ -63,9 +63,61 @@ class RatingsPlugin extends Plugin
         };
     }
 
-    public function onTwigSiteVariables() {
-        $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
-        $this->grav['twig']->twig_vars['ratings'] = $this->fetchRatings();
+    /**
+     * Initialize the plugin
+     */
+    public function onPluginsInitialized()
+    {
+        // Don't proceed if we are in the admin plugin
+        if ($this->isAdmin()) {
+            return;
+        }
+
+        // TODO check for routes at a very early state?
+
+        $this->enable([
+            'onPageInitialized' => ['onPageInitialized', 1000],
+            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0]
+        ]);
+
+        // Handle activation token links
+        $path = $this->grav['uri']->path();
+        if ($path === $this->config->get('plugins.ratings.route_activate')) {
+            $this->enable([
+                // Second event that subscribes onPagesInitialized
+                // to handle email activation token links
+                'onPagesInitialized' => ['handleRatingActivation', 0],
+            ]);
+        }
+
+        $cache = $this->grav['cache'];
+        $uri = $this->grav['uri'];
+
+        //init cache id
+        $this->ratings_cache_id = md5('ratings-data' . $cache->getKey() . '-' . $uri->url());
+    }
+
+    public function onPageInitialized(Event $event)
+    {
+        // Check if the plugin should be enabled.
+        // We need to check this in the page initialized event
+        // in order to access the page template property.
+        $this->calculateEnable();
+
+        // Enable the main events we are interested in
+        if ($this->enable) {
+            // NOTE: We must add the form here and not in the onFormPageHeaderProcessed event.
+            // The mentioned event will run before onPageInitialized, but we can only validate
+            // the page template filters after the page got initialized. Thatswhy the form will be
+            // added at this later stage.
+            $this->grav['page']->addForms([$this->grav['config']->get('plugins.ratings.form')]);
+
+            $this->enable([
+                'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
+                'onFormProcessed' => ['onFormProcessed', 0],
+                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            ]);
+        }
     }
 
     /**
@@ -106,61 +158,6 @@ class RatingsPlugin extends Plugin
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Initialize the plugin
-     */
-    public function onPluginsInitialized()
-    {
-        // Don't proceed if we are in the admin plugin
-        if ($this->isAdmin()) {
-            return;
-        }
-
-        // TODO check for routes at a very early state?
-
-        $this->enable([
-            'onPageInitialized' => ['onPageInitialized', 1000],
-            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0]
-        ]);
-
-        // Handle activation token links
-        $path = $this->grav['uri']->path();
-        if ($path === $this->config->get('plugins.ratings.route_activate')) {
-            $this->enable([
-                'onPagesInitialized' => ['handleRatingActivation', 0],
-            ]);
-        }
-
-        $cache = $this->grav['cache'];
-        $uri = $this->grav['uri'];
-
-        //init cache id
-        $this->ratings_cache_id = md5('ratings-data' . $cache->getKey() . '-' . $uri->url());
-    }
-
-    public function onPageInitialized(Event $event)
-    {
-        // Check if the plugin should be enabled.
-        // We need to check this in the page initialized event
-        // in order to access the page template property.
-        $this->calculateEnable();
-
-        // Enable the main events we are interested in
-        if ($this->enable) {
-            // NOTE: We must add the form here and not in the onFormPageHeaderProcessed event.
-            // The mentioned event will run before onPageInitialized, but we can only validate
-            // the page template filters after the page got initialized. Thatswhy the form will be
-            // added at this later stage.
-            $this->grav['page']->addForms([$this->grav['config']->get('plugins.ratings.form')]);
-
-            $this->enable([
-                'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
-                'onFormProcessed' => ['onFormProcessed', 0],
-                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
-            ]);
         }
     }
 
@@ -245,32 +242,9 @@ class RatingsPlugin extends Plugin
         }
     }
 
-    /**
-     * Check if a specified rating is moderated.
-     * If moderation is not enabled in the settings,
-     * moderation will be always true.
-     * @param array $rating The rating to check its moderated state
-     * @return bool True if rating is moderated and should be visible to the user.
-     */
-    public function isModerated($rating)
-    {
-        if (!$this->grav['config']->get('plugins.ratings.moderation')) {
-            $rating['moderated'] = 1;
-            return true;
-        }
-
-        if (!isset($rating['moderated'])) {
-            $rating['moderated'] = 0;
-
-            // TODO return false? https://github.com/getgrav/grav-plugin-guestbook/commit/21d8d74266facc132a12f368b6b3dd46c930d636#r42406354
-            return $this->isModerated($rating);
-        } elseif ($rating['moderated'] == 0) {
-            return false;
-        } elseif ($rating['moderated'] == 1) {
-            return true;
-        }
-
-        return false;
+    public function onTwigSiteVariables() {
+        $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
+        $this->grav['twig']->twig_vars['ratings'] = $this->fetchRatings();
     }
 
     /**
@@ -303,13 +277,32 @@ class RatingsPlugin extends Plugin
     }
 
     /**
-     * Add templates directory to twig lookup paths.
+     * Check if a specified rating is moderated.
+     * If moderation is not enabled in the settings,
+     * moderation will be always true.
+     * @param array $rating The rating to check its moderated state
+     * @return bool True if rating is moderated and should be visible to the user.
      */
-    public function onTwigTemplatePaths()
+    public function isModerated($rating)
     {
-        $this->grav['twig']->twig_paths[] = __DIR__ . '/templates';
-    }
+        if (!$this->grav['config']->get('plugins.ratings.moderation')) {
+            $rating['moderated'] = 1;
+            return true;
+        }
 
+        if (!isset($rating['moderated'])) {
+            $rating['moderated'] = 0;
+
+            // TODO return false? https://github.com/getgrav/grav-plugin-guestbook/commit/21d8d74266facc132a12f368b6b3dd46c930d636#r42406354
+            return $this->isModerated($rating);
+        } elseif ($rating['moderated'] == 0) {
+            return false;
+        } elseif ($rating['moderated'] == 1) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Handle rating activation
@@ -368,5 +361,13 @@ class RatingsPlugin extends Plugin
         $redirect_route = $rating->page;
         $redirect_code = null;
         $this->grav->redirectLangSafe($redirect_route ?: '/', $redirect_code);
+    }
+
+    /**
+     * Add templates directory to twig lookup paths.
+     */
+    public function onTwigTemplatePaths()
+    {
+        $this->grav['twig']->twig_paths[] = __DIR__ . '/templates';
     }
 }
