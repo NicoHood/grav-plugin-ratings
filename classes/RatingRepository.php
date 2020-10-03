@@ -126,24 +126,37 @@ class RatingRepository
         return $results;
     }
 
-    public function find(string $page, ?string $email = null, ?int $stars = null) {
+    public function find(?string $page = null, ?string $email = null,
+      ?int $stars = null, ?string $token = null) {
         $query = "SELECT *
           FROM {$this->table_ratings}
-          WHERE page = :page";
+          WHERE TRUE";
 
+        if (null !== $page) {
+            $query .= ' AND page = :page';
+        }
         if (null !== $email) {
             $query .= ' AND email = :email';
         }
         if (null !== $stars) {
             $query .= ' AND stars = :stars';
         }
+        if (null !== $token) {
+            $query .= ' AND token = :token';
+        }
+
         $statement = $this->db->prepare($query);
-        $statement->bindValue(':page', $page, PDO::PARAM_STR);
+        if (null !== $page) {
+            $statement->bindValue(':page', $page, PDO::PARAM_STR);
+        }
         if (null !== $email) {
             $statement->bindValue(':email', $email, PDO::PARAM_STR);
         }
         if (null !== $stars) {
             $statement->bindValue(':stars', $stars, PDO::PARAM_INT);
+        }
+        if (null !== $token) {
+            $statement->bindValue(':token', $token, PDO::PARAM_STRING);
         }
         $statement->execute();
 
