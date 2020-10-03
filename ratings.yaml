@@ -75,7 +75,7 @@ form:
           type: hidden
           evaluateDefault: grav.uri.path
 
-        - name: rating
+        - name: stars
           type: rating
           label: PLUGIN_RATINGS.RATING_LABEL
           default: 0

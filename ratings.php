@@ -244,8 +244,7 @@ class RatingsPlugin extends Plugin
                 $text = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
                 $name = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
                 $email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-                // TODO rename form param to stars
-                $stars = (int) filter_var(urldecode($post['rating']), FILTER_SANITIZE_NUMBER_INT);
+                $stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
 
                 $moderated = 0;
                 if (!$this->grav['config']->get('plugins.ratings.moderation')) {
