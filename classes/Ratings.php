@@ -17,15 +17,9 @@ class Ratings
     /** @var Language $language */
     protected $language;
 
-    /** @var PDO */
-    protected $db;
-
     protected $config;
     protected $path = 'user-data://ratings';
     protected $db_name = 'ratings.db';
-
-    // Tables
-    protected $table_ratings = 'ratings';
 
     /** @var RatingRepository */
     protected $rating_repository;
@@ -44,10 +38,6 @@ class Ratings
         }
 
         $connect_string = 'sqlite:' . $db_path . '/' . $this->db_name;
-
-        $this->db = $this->grav['database']->connect($connect_string);
-        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         $this->rating_repository = new RatingRepository($this->grav['database'], $connect_string);
     }
 
@@ -76,16 +66,6 @@ class Ratings
         $rating->set_token_activated();
         $this->rating_repository->update($rating);
         return $rating;
-    }
-
-    public function removeInactivatedRatings(string $page) {
-        // If there are other ratings on the same page/email with pending tokens, delete them now.
-        $query = "DELETE FROM {$this->table_ratings}
-          WHERE page = :page
-          AND expire IS NOT NULL";
-        $statement = $this->db->prepare($query);
-        $statement->bindValue(':page', $page, PDO::PARAM_STR);
-        $statement->execute();
     }
 
     /**

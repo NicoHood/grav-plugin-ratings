@@ -302,10 +302,7 @@ class RatingsPlugin extends Plugin
                 $messages->add($message, 'error');
             }
             else {
-
                 $this->grav['ratings']->activateRating($rating);
-                // TODO remove not required tokens? We could still use them to display better error messages
-                //$this->grav['ratings']->removeInactivatedRatings($page);
 
                 // TODO implement
                 // if ($this->config->get('plugins.ratings.send_confirmation_email', false)) {
