@@ -45,7 +45,7 @@ form:
             required: true
 
         - name: email
-          label: Email (wird nicht veröffentlicht)
+          label: PLUGIN_RATINGS.EMAIL_LABEL
           placeholder: PLUGIN_RATINGS.EMAIL_PLACEHOLDER
           type: email
           validate:
