@@ -259,49 +259,11 @@ class RatingsPlugin extends Plugin
         }
 
         $path = $this->grav['uri']->path();
-        $data = $this->grav['ratings']->getRatings($path);
-
-        // Filter out not yet moderated ratings
-        // TODO move to database function?
-        $moderated = [];
-        foreach ($data as $value) {
-            if ($this->isModerated($value)) {
-                $moderated[] = $value;
-            }
-        }
-        $ratings = $moderated;
+        $ratings = $this->grav['ratings']->getActiveModeratedRatings($path);
 
         // Save to cache if enabled
         $cache->save($this->ratings_cache_id, $ratings);
         return $ratings;
-    }
-
-    /**
-     * Check if a specified rating is moderated.
-     * If moderation is not enabled in the settings,
-     * moderation will be always true.
-     * @param array $rating The rating to check its moderated state
-     * @return bool True if rating is moderated and should be visible to the user.
-     */
-    public function isModerated($rating)
-    {
-        if (!$this->grav['config']->get('plugins.ratings.moderation')) {
-            $rating['moderated'] = 1;
-            return true;
-        }
-
-        if (!isset($rating['moderated'])) {
-            $rating['moderated'] = 0;
-
-            // TODO return false? https://github.com/getgrav/grav-plugin-guestbook/commit/21d8d74266facc132a12f368b6b3dd46c930d636#r42406354
-            return $this->isModerated($rating);
-        } elseif ($rating['moderated'] == 0) {
-            return false;
-        } elseif ($rating['moderated'] == 1) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

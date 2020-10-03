@@ -139,6 +139,20 @@ class Ratings
         $this->rating_repository->update($rating);
     }
 
+    public function getActiveModeratedRatings(string $page) {
+        $ratings = $this->rating_repository->find($page);
+
+        // Filter not moderated ratings
+        $ratings = array_filter($ratings, function(Rating $rating) : bool {
+            return $rating->moderated;
+        });
+
+        // Only allow activated ratings.
+        $ratings = array_filter($ratings, function(Rating $rating) : bool {
+            return $rating->token_activated();
+        });
+        return $ratings;
+    }
 
     // TODO rename to getActiveModeratedRatings
     // TODO also check moderated state, and make sure the rating is active
