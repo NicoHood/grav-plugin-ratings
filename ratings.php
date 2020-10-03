@@ -319,6 +319,9 @@ class RatingsPlugin extends Plugin
             }
         }
 
+        // Clear cache
+        $this->grav['cache']->delete($this->ratings_cache_id);
+
         // Redirect to the rated page
         $redirect_route = $rating->page;
         $redirect_code = null;
