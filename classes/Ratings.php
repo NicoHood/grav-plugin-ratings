@@ -191,27 +191,14 @@ class Ratings
     }
 
     public function hasAlreadyRated(Rating $rating) : bool {
-        $page = $rating->page;
-        $email = $rating->email;
+        $ratings = $this->rating_repository->find($rating->page, $rating->email);
 
-        // Make sure to only count activated tokens (expire is NULL)
-        // If a rating was not yet verified,
-        // treat this as if the user did not vote on this page.
-        $query = "SELECT EXISTS(
-          SELECT 1 FROM {$this->table_ratings}
-          WHERE page = :page
-          AND email = :email
-          AND expire IS NULL
-          LIMIT 1)";
-        $statement = $this->db->prepare($query);
-        $statement->bindValue(':page', $page, PDO::PARAM_STR);
-        $statement->bindValue(':email', $email, PDO::PARAM_STR);
-        $statement->execute();
-        $result = $statement->fetchColumn();
-
-        // NOTE: we are doing a lazy check here (== instead of ===),
-        // as the database will return a string instead of an int or bool.
-        return $result == "1" ? true : false;
+        // Only allow activated ratings.
+        // NOTE: We also count not yet moderated ratings.
+        $ratings = array_filter($ratings, function(Rating $rating) : bool {
+            return $rating->token_activated();
+        });
+        return count($ratings) > 0;
     }
 
     public function hasReachedRatingLimit($email) : bool {
@@ -222,21 +209,17 @@ class Ratings
             return false;
         }
 
-        // Make sure to only count activated tokens (expire is NULL)
-        // If a rating was not yet verified,
-        // treat this as if the user did not vote on this page.
-        $query = "SELECT COUNT(DISTINCT page)
-          FROM {$this->table_ratings}
-          WHERE email = :email
-          AND expire is NULL";
-        $statement = $this->db->prepare($query);
-        $statement->bindValue(':email', $email, PDO::PARAM_STR);
-        $statement->execute();
-        $result = $statement->fetchColumn();
+        // Get all rating from this user/email
+        $ratings = $this->rating_repository->find(null, $email);
 
-        // NOTE: we are doing a lazy check here (>= instead of >==),
-        // as the database will return a string instead of an int.
-        return $result >= $limit ? true : false;
+        // NOTE: We also count not yet moderated ratings.
+        // NOTE: We also count not yet activated rating
+        $ratings = array_filter($ratings, function(Rating $rating) : bool {
+            // But we do filter out expired tokens
+            return !$rating->token_expired();
+        });
+
+        return count($ratings) >= $limit;
     }
 
     // $post should be from $event['form']->data()
