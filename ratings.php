@@ -225,14 +225,12 @@ class RatingsPlugin extends Plugin
 
         switch ($action) {
             case 'addRating':
-                $rating = $this->grav['ratings']->getRatingFromPostData($event['form']->data());
+                $rating = $this->grav['ratings']->getRatingFromPostData($form->data());
 
-                // Check if there is currently a not yet verified rating and invalidate those
-                $existingRatings = $this->grav['ratings']->getRating($rating->page, $rating->email);
-                foreach ($existingRatings as $existingRating) {
-                    $this->grav['ratings']->expireRating($existingRating);
-                }
+                // Check if there are currently a not yet activated ratings and invalidate those
+                $this->grav['ratings']->expireAllRatings($rating->page, $rating->email);
 
+                // Add new rating
                 $this->grav['ratings']->addRating($rating);
 
                 // Clear cache

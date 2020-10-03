@@ -126,13 +126,13 @@ class Ratings
         return true;
     }
 
-    public function getRating(string $page, string $email) {
-        return $this->rating_repository->find($page, $email);
-    }
+    public function expireAllRatings(string $page, string $email) {
+        $ratings = $this->rating_repository->find($page, $email);
 
-    public function expireRating(Rating $rating) {
-        $rating->set_expired();
-        $this->rating_repository->update($rating);
+        foreach ($ratings as $rating) {
+            $rating->set_expired();
+            $this->rating_repository->update($rating);
+        }
     }
 
     public function getActiveModeratedRatings(string $page) {
