@@ -48,10 +48,6 @@ class Ratings
         $this->db = $this->grav['database']->connect($connect_string);
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // if (!$this->db->tableExists($this->table_ratings)) {
-        //     $this->createTables();
-        // }
-
         $this->rating_repository = new RatingRepository($this->grav['database'], $connect_string);
     }
 
@@ -152,42 +148,6 @@ class Ratings
             return $rating->token_activated();
         });
         return $ratings;
-    }
-
-    // TODO rename to getActiveModeratedRatings
-    // TODO also check moderated state, and make sure the rating is active
-    public function getRatings(string $page, string $email = NULL, int $stars = NULL) {
-        // Make sure to only count activated tokens (expire == NULL)
-        // If a rating was not yet verified,
-        // treat this as if the user did not vote on this page.
-        $query = "SELECT stars, page, email, author, review, date, moderated
-          FROM {$this->table_ratings}
-          WHERE page = :page
-          AND expire IS NULL";
-
-        if (null !== $email) {
-            $query .= ' AND email = :email';
-        }
-        if (null !== $stars) {
-            $query .= ' AND stars = :stars';
-        }
-
-        $statement = $this->db->prepare($query);
-        if (null !== $email) {
-            $statement->bindValue(':email', $email, PDO::PARAM_STR);
-        }
-        if (null !== $stars) {
-            $statement->bindValue(':stars', $stars, PDO::PARAM_INT);
-        }
-        $statement->bindValue(':page', $page, PDO::PARAM_STR);
-        $statement->execute();
-
-        // We want only the associated values e.g.: 'stars' -> 5
-        // instead of also having array indexes: 0 -> 5
-        $results = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        // If there a no results, an empty arra [] will be returned.
-        return $results;
     }
 
     public function hasAlreadyRated(Rating $rating) : bool {
