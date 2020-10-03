@@ -29,7 +29,7 @@ class Rating
 
     // TODO add date
 
-    function token_expired(): bool {
+    function token_expired() : bool {
         if ($this->expire === 0 || $this->expire === NULL) {
             return false;
         }
@@ -56,7 +56,7 @@ class Rating
         $this->expire = 1;
     }
 
-    function token_activated():bool {
+    function token_activated() :bool {
         return $this->expire === NULL;
     }
 
@@ -84,9 +84,7 @@ class RatingRepository
         }
     }
 
-    // TODO improve class parameter?
-    // TODO add return type
-    public function create($rating) {
+    public function create(Rating $rating) : Rating {
         // If the ID is set, we're updating an existing record
         if (isset($rating->id)) {
             return $rating->update($user);
@@ -332,10 +330,10 @@ class Ratings
         return $results[0];
     }
 
-    // TODO add function param class type
-    public function activateRating($rating) {
+    public function activateRating(Rating $rating) : Rating {
         $rating->set_token_activated();
         $this->rating_repository->update($rating);
+        return $rating;
     }
 
     public function removeInactivatedRatings(string $page) {
@@ -390,8 +388,7 @@ class Ratings
         return $this->rating_repository->find($page, $email);
     }
 
-    // TODO rename plural
-    public function expireRating($rating) {
+    public function expireRating(Rating $rating) {
         $rating->set_expired();
         $this->rating_repository->update($rating);
     }
