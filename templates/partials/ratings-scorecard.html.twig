@@ -1,32 +1,18 @@
 {% if enable_ratings_plugin %}
 
     {% if ratings|length %}
-
-        {% set rating_min = 1 %}
-        {% set rating_max = 5 %}
-        {% set rating_count = ratings|length %}
-
-        {# Calculate average and average rounded to the next half star (e.g. 3.3 -> 3.5) #}
-        {% set sumratings = 0 %}
-        {% for rating in ratings %}
-          {% set sumratings = sumratings + rating.stars %}
-        {% endfor %}
-        {% set rating_avg = rating_count == 0 ? 0 : (sumratings / rating_count)|round(1) %}
-        {% set rating_avg_half_star = rating_count == 0 ? 0 : ((rating_avg) * 2)|round / 2 %}
-
         <div class="columns">
           <div class="column col-6">
 
             <div class="rating-scorecard">
-              {% for rating_number in rating_max .. rating_min %}
-                {% set rating_number_count = ratings|filter(x => x.stars == rating_number)|length %}
+              {% for rating_stars in rating_results.max .. rating_results.min %}
                 <div class="rating-scorecard-item columns">
                   <div class="column col-3">
                     <div>
-                      {{ rating_number}}&nbsp;
+                      {{ rating_stars}}&nbsp;
                     </div>
 
-                    <ul class="rating-score" data-rating="{{ rating_number }}">
+                    <ul class="rating-score" data-rating="{{ rating_stars }}">
                       <li class="rating-score-item"></li>
                       <li class="rating-score-item"></li>
                       <li class="rating-score-item"></li>
@@ -34,13 +20,12 @@
                       <li class="rating-score-item"></li>
                     </ul>
 
-                    {# <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i> #}
                   </div>
                   <div class="column col-8">
-                    <progress class="progress" value="{{ rating_number_count }}" max="{{ rating_count }}"></progress>
+                    <progress class="progress" value="{{ rating_results[rating_stars] }}" max="{{ rating_results.count }}"></progress>
                   </div>
                   <div class="column col-1">
-                    {{ rating_number_count }}
+                    {{ rating_results[rating_stars] }}
                   </div>
                 </div>
               {% endfor %}
@@ -50,19 +35,6 @@
 
           </div>
         </div>
-
-        <ul class="rating-score" data-rating="{{ rating_avg_half_star }}">
-          <li class="rating-score-item"></li>
-          <li class="rating-score-item"></li>
-          <li class="rating-score-item"></li>
-          <li class="rating-score-item"></li>
-          <li class="rating-score-item"></li>
-        </ul>
-
-        Real AVG: {{ rating_avg }}<br>
-        AVG: {{ rating_avg_half_star }}<br>
-        total: {{ ratings|length }}
-
 
     {% endif %}
 {% endif %}

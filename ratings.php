@@ -241,8 +241,10 @@ class RatingsPlugin extends Plugin
     }
 
     public function onTwigSiteVariables() {
+        $path = $this->grav['uri']->path();
         $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
         $this->grav['twig']->twig_vars['ratings'] = $this->fetchRatings();
+        $this->grav['twig']->twig_vars['rating_results'] = $this->grav['ratings']->getResults($path);
     }
 
     /**

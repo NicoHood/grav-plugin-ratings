@@ -192,4 +192,39 @@ class Ratings
 
         return $rating;
     }
+
+    public function getResults(string $page) {
+        // Get all ratings for this page
+        $ratings = $this->getActiveModeratedRatings($page);
+
+        $min = 1;
+        $max = 5;
+        $count = count($ratings);
+        $stars = array_fill(1, 5, 0);
+
+        // Calculate average
+        $sum = 0;
+        foreach ($ratings as $rating) {
+            $sum += $rating->stars;
+            $stars[$rating->stars] += 1;
+        }
+        $average = $count === 0 ? 0 : round(($sum / $count), 1);
+
+        // Calculate average rounded to the next half star (e.g. 3.3 -> 3.5)
+        $average_rounded = round($average * 2) / 2;
+
+        $results = [
+            "min" => $min,
+            "max" => $max,
+            "count" => (int) $count,
+            "average" => (float) $average,
+            "average_rounded" => (float) $average_rounded,
+            "1" => (int) $stars[1],
+            "2" => (int) $stars[2],
+            "3" => (int) $stars[3],
+            "4" => (int) $stars[4],
+            "5" => (int) $stars[5]
+        ];
+        return $results;
+    }
 }
