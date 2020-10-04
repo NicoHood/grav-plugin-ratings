@@ -69,6 +69,7 @@ class RatingsPlugin extends Plugin
     {
         // Don't proceed if we are in the admin plugin
         if ($this->isAdmin()) {
+            $this->active = false;
             return;
         }
 
