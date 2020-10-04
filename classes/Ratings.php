@@ -18,6 +18,9 @@ class Ratings
     /** @var Language $language */
     protected $language;
 
+    /** @var Cache $cache */
+    protected $cache;
+
     protected $config;
     protected $path = 'user-data://ratings';
     protected $db_name = 'ratings.db';
@@ -29,6 +32,7 @@ class Ratings
     {
         $this->grav = Grav::instance();
         $this->language = $this->grav['language'];
+        $this->cache = $this->grav['cache'];
 
         $this->config = new Config($config);
         $db_path = $this->grav['locator']->findResource($this->path, true, true);
@@ -44,6 +48,10 @@ class Ratings
 
     public function addRating(Rating $rating) {
         $this->rating_repository->create($rating);
+
+        // Clear cache
+        $cache_id = $this->getRatingsCacheId($rating->page);
+        $this->cache->delete($cache_id);
 
         if($rating->token) {
             $this->sendActivationEmail($rating);
@@ -66,6 +74,11 @@ class Ratings
     public function activateRating(Rating $rating) : Rating {
         $rating->set_token_activated();
         $this->rating_repository->update($rating);
+
+        // Clear cache
+        $cache_id = $this->getRatingsCacheId($rating->page);
+        $this->cache->delete($cache_id);
+
         return $rating;
     }
 
@@ -117,6 +130,12 @@ class Ratings
     }
 
     public function getActiveModeratedRatings(string $page) {
+        // Search in cache
+        $cache_id = $this->getRatingsCacheId($page);
+        if ($ratings = $this->cache->fetch($cache_id)) {
+            return $ratings;
+        }
+
         $ratings = $this->rating_repository->find($page);
 
         // Filter not moderated ratings
@@ -128,6 +147,9 @@ class Ratings
         $ratings = array_filter($ratings, function(Rating $rating) : bool {
             return $rating->token_activated();
         });
+
+        // Save to cache if enabled
+        $this->cache->save($cache_id, $ratings);
         return $ratings;
     }
 
@@ -193,7 +215,13 @@ class Ratings
         return $rating;
     }
 
-    public function getResults(string $page) {
+    public function getRatingResults(string $page) {
+        // Search in cache
+        $cache_id = $this->getRatingResultsCacheId($page);
+        if ($results = $this->cache->fetch($cache_id)) {
+            return $results;
+        }
+
         // Get all ratings for this page
         $ratings = $this->getActiveModeratedRatings($page);
 
@@ -225,6 +253,19 @@ class Ratings
             "4" => (int) $stars[4],
             "5" => (int) $stars[5]
         ];
+
+        // Save to cache if enabled
+        $this->cache->save($cache_id, $results);
         return $results;
+    }
+
+    protected function getRatingsCacheId($page) {
+        // Cache key allows us to invalidate all cache on configuration changes.
+        return hash('sha256', 'ratings-data' . $this->cache->getKey() . '-' . $page);
+    }
+
+    protected function getRatingResultsCacheId($page) {
+        // Cache key allows us to invalidate all cache on configuration changes.
+        return hash('sha256', 'ratings-results' . $this->cache->getKey() . '-' . $page);
     }
 }

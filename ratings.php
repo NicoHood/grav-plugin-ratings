@@ -17,7 +17,6 @@ use Grav\Plugin\Ratings\Rating;
 class RatingsPlugin extends Plugin
 {
     protected $enable = false;
-    protected $ratings_cache_id;
 
     /**
      * @return array
@@ -89,12 +88,6 @@ class RatingsPlugin extends Plugin
                 'onPagesInitialized' => ['handleRatingActivation', 0],
             ]);
         }
-
-        $cache = $this->grav['cache'];
-        $uri = $this->grav['uri'];
-
-        //init cache id
-        $this->ratings_cache_id = md5('ratings-data' . $cache->getKey() . '-' . $uri->url());
     }
 
     public function onPageInitialized(Event $event)
@@ -232,10 +225,6 @@ class RatingsPlugin extends Plugin
 
                 // Add new rating
                 $this->grav['ratings']->addRating($rating);
-
-                // Clear cache
-                $this->grav['cache']->delete($this->ratings_cache_id);
-
                 break;
         }
     }
@@ -243,27 +232,8 @@ class RatingsPlugin extends Plugin
     public function onTwigSiteVariables() {
         $path = $this->grav['uri']->path();
         $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
-        $this->grav['twig']->twig_vars['ratings'] = $this->fetchRatings();
-        $this->grav['twig']->twig_vars['rating_results'] = $this->grav['ratings']->getResults($path);
-    }
-
-    /**
-     * Return the ratings associated to the current route
-     */
-    private function fetchRatings() {
-        $cache = $this->grav['cache'];
-
-        // Search in cache
-        if ($ratings = $cache->fetch($this->ratings_cache_id)) {
-            return $ratings;
-        }
-
-        $path = $this->grav['uri']->path();
-        $ratings = $this->grav['ratings']->getActiveModeratedRatings($path);
-
-        // Save to cache if enabled
-        $cache->save($this->ratings_cache_id, $ratings);
-        return $ratings;
+        $this->grav['twig']->twig_vars['ratings'] = $this->grav['ratings']->getActiveModeratedRatings($path);
+        $this->grav['twig']->twig_vars['rating_results'] = $this->grav['ratings']->getRatingResults($path);
     }
 
     /**
@@ -315,9 +285,6 @@ class RatingsPlugin extends Plugin
                 $messages->add($message, 'info');
             }
         }
-
-        // Clear cache
-        $this->grav['cache']->delete($this->ratings_cache_id);
 
         // Redirect to the rated page
         $redirect_route = $rating->page;
