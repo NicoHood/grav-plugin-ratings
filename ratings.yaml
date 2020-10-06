@@ -54,8 +54,8 @@ form:
             required: true
 
         - name: text
-          label: PLUGIN_RATINGS.MESSAGE_LABEL
-          placeholder: PLUGIN_RATINGS.MESSAGE_PLACEHOLDER
+          label: PLUGIN_RATINGS.REVIEW_LABEL
+          placeholder: PLUGIN_RATINGS.REVIEW_PLACEHOLDER
           type: textarea
           validate:
             required: true

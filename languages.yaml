@@ -7,8 +7,10 @@ en:
     NAME_PLACEHOLDER: "Enter your name"
     EMAIL_LABEL: "Email (not published)"
     EMAIL_PLACEHOLDER: "Enter your email address"
-    MESSAGE_LABEL: "Review"
-    MESSAGE_PLACEHOLDER: "Enter your review"
+    REVIEW_LABEL: "Review"
+    REVIEW_PLACEHOLDER: "Enter your review"
+    TITLE_LABEL: "Title"
+    TITLE_PLACEHOLDER: "What is most important?"
     SUBMIT_RATING_BUTTON_TEXT: "Submit"
     EMAIL_NEW_RATING_SUBJECT: "[New Rating] from {{ form.value.name|e }}"
     WRITTEN_ON: Written on
@@ -36,13 +38,15 @@ de:
   PLUGIN_RATINGS:
     ADD_RATING: Bewertung verfassen
     RATINGS: Bewertungen
-    RATING_LABEL: Bewertung
+    RATING_LABEL: Gesamtbewertung
     NAME_LABEL: "Name"
     NAME_PLACEHOLDER: "Dein Name"
     EMAIL_LABEL: "Email (wird nicht veröffentlicht)"
     EMAIL_PLACEHOLDER: "Deine Email"
-    MESSAGE_LABEL: "Erfahrungsbericht"
-    MESSAGE_PLACEHOLDER: "Dein Erfahrungsbericht"
+    REVIEW_LABEL: "Erfahrungsbericht"
+    REVIEW_PLACEHOLDER: "Dein Erfahrungsbericht"
+    TITLE_LABEL: "Titel"
+    TITLE_PLACEHOLDER: "Was ist das Wichtigste?"
     SUBMIT_RATING_BUTTON_TEXT: "Absenden"
     EMAIL_NEW_RATING_SUBJECT: '[Neue Bewertung] von {{ form.value.name|e }}'
     WRITTEN_ON: Geschrieben am
@@ -62,3 +66,4 @@ de:
     ACTIVATION_SUCCESS: "Bewertung erfolgreich aktiviert."
     TOKEN_EXPIRED: "Token abgelaufen."
     RATING_ALREADY_ACTIVATED: "Diese Bewertung wurde bereits erfolgreich aktiviert."
+    RATE_NOW: "Jetzt Bewerten"
