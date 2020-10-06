@@ -228,7 +228,7 @@ class Ratings
         $min = 1;
         $max = 5;
         $count = count($ratings);
-        $stars = array_fill(1, 5, 0);
+        $stars = array_fill($min, $max, 0);
 
         // Calculate average
         $sum = 0;
