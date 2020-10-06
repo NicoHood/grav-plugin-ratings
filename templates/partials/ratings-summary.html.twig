@@ -1,0 +1,19 @@
+{% if enable_ratings_plugin %}
+
+  <div class="ratings-summary">
+    <span class="ratings-summary-average">{{ rating_results.average }}</span>
+
+    <ul class="rating-score" data-rating="{{ rating_results.average_rounded }}">
+      <li class="rating-score-item"></li>
+      <li class="rating-score-item"></li>
+      <li class="rating-score-item"></li>
+      <li class="rating-score-item"></li>
+      <li class="rating-score-item"></li>
+    </ul>
+
+    <div class="ratings-summary-count">
+      {{ rating_results.count }} {{ 'PLUGIN_RATINGS.RATINGS'|t }}
+    </div>
+  </div>
+
+{% endif %}

@@ -1,40 +1,27 @@
 {% if enable_ratings_plugin %}
 
-    {% if ratings|length %}
-        <div class="columns">
-          <div class="column col-6">
+  <div class="ratings-scorecard">
+    {% for rating_stars in rating_results.max .. rating_results.min %}
+      <div class="ratings-scorecard-item">
+        <div class="ratings-scorecard-stars">
+          {{ rating_stars}}
 
-            <div class="rating-scorecard">
-              {% for rating_stars in rating_results.max .. rating_results.min %}
-                <div class="rating-scorecard-item columns">
-                  <div class="column col-3">
-                    <div>
-                      {{ rating_stars}}&nbsp;
-                    </div>
-
-                    <ul class="rating-score" data-rating="{{ rating_stars }}">
-                      <li class="rating-score-item"></li>
-                      <li class="rating-score-item"></li>
-                      <li class="rating-score-item"></li>
-                      <li class="rating-score-item"></li>
-                      <li class="rating-score-item"></li>
-                    </ul>
-
-                  </div>
-                  <div class="column col-8">
-                    <progress class="progress" value="{{ rating_results[rating_stars] }}" max="{{ rating_results.count }}"></progress>
-                  </div>
-                  <div class="column col-1">
-                    {{ rating_results[rating_stars] }}
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="column col-6">
-
-          </div>
+          <ul class="rating-score" data-rating="{{ rating_stars }}">
+            <li class="rating-score-item"></li>
+            <li class="rating-score-item"></li>
+            <li class="rating-score-item"></li>
+            <li class="rating-score-item"></li>
+            <li class="rating-score-item"></li>
+          </ul>
         </div>
+        <div>
+          <progress value="{{ rating_results[rating_stars] }}" max="{{ rating_results.count }}"></progress>
+        </div>
+        <div>
+          {{ rating_results[rating_stars] }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 
-    {% endif %}
 {% endif %}

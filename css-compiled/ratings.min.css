@@ -1,0 +1,33 @@
+.rating-score[data-rating='5.5'] .rating-score-item:nth-child(-n + 5):after, .rating-score[data-rating='5'] .rating-score-item:nth-child(-n + 5):after, .rating-score[data-rating='4.5'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='4'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='3.5'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='3'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='2.5'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='2'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='1.5'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='1'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='0.5'] .rating-score-item:nth-child(-n + 0):after, .rating-score[data-rating='0'] .rating-score-item:nth-child(-n + 0):after { content: "\f005"; }
+
+.rating-score[data-rating='5.5'] .rating-score-item:nth-child(6):after, .rating-score[data-rating='4.5'] .rating-score-item:nth-child(5):after, .rating-score[data-rating='3.5'] .rating-score-item:nth-child(4):after, .rating-score[data-rating='2.5'] .rating-score-item:nth-child(3):after, .rating-score[data-rating='1.5'] .rating-score-item:nth-child(2):after, .rating-score[data-rating='0.5'] .rating-score-item:nth-child(1):after { content: "\f123"; }
+
+.rating-score .rating-score-item:after { content: "\f006"; }
+
+.rating-score { display: inline-flex; flex-direction: row; align-items: flex-start; margin: 0; padding: 0; color: #FBC000; }
+
+.rating-score .rating-score-item { font-size: inherit; margin: 0; padding: 0; display: block; font-family: FontAwesome; }
+
+.ratings-summary { display: flex; flex-direction: column; align-items: center; }
+
+.ratings-summary .ratings-summary-average { font-size: 3rem; font-weight: bold; margin-bottom: -1rem; }
+
+.ratings-summary .rating-score { font-size: 1.25rem; }
+
+.ratings-scorecard { display: table; }
+
+.ratings-scorecard .ratings-scorecard-item { display: table-row; }
+
+.ratings-scorecard .ratings-scorecard-item > div { display: table-cell; white-space: nowrap; }
+
+.ratings-scorecard .ratings-scorecard-item > div:nth-child(2) { width: 100%; padding-left: 0.5rem; padding-right: 0.5rem; }
+
+.ratings-scorecard .ratings-scorecard-item > div .rating-score > .rating-score-item { font-size: 1.25em; }
+
+.ratings-scorecard .ratings-scorecard-item > div progress { appearance: none; position: relative; width: 100%; height: 0.6rem; background: #EEEEEE; color: #FBC000; border: 0; border-radius: 0.1rem; }
+
+.ratings-scorecard .ratings-scorecard-item > div progress::-webkit-progress-bar { background: transparent; border-radius: 0.1rem; }
+
+.ratings-scorecard .ratings-scorecard-item > div progress::-webkit-progress-value { background: #FBC000; border-radius: 0.1rem; }
+
+.ratings-scorecard .ratings-scorecard-item > div progress::-moz-progress-bar { background: #FBC000; border-radius: 0.1rem; }

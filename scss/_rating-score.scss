@@ -1,0 +1,55 @@
+// Borrowed from https://codepen.io/mustra/pen/WmvzZG?editors=1100
+%full-star {
+  &:after {
+    content: "\f005";
+  }
+};
+
+%half-star {
+  &:after {
+    content: "\f123";
+  }
+};
+
+%empty-star {
+  &:after {
+    content: "\f006";
+  }
+};
+
+.rating-score {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  color: $star-color;
+
+  .rating-score-item {
+    font-size: inherit;
+    margin: 0;
+    padding: 0;
+    display: block;
+    font-family: FontAwesome;
+
+    @extend %empty-star;
+  }
+
+  @for $i from 0 to 6 {
+    &[data-rating='#{$i}'] {
+      .rating-score-item:nth-child(-n + #{$i}) {
+        @extend %full-star;
+      }
+    }
+
+    &[data-rating='#{$i + 0.5}'] {
+      .rating-score-item:nth-child(-n + #{$i}) {
+        @extend %full-star;
+      }
+
+      .rating-score-item:nth-child(#{$i + 1}) {
+        @extend %half-star;
+      }
+    }
+  }
+}

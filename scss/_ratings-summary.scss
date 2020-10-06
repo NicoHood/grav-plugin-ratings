@@ -1,0 +1,14 @@
+.ratings-summary {
+  display: flex;
+  flex-direction:column;
+  align-items: center;
+
+  .ratings-summary-average {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: -1rem;
+  }
+  .rating-score {
+    font-size: 1.25rem;
+  }
+}
