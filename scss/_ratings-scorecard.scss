@@ -14,6 +14,10 @@
         padding-right: 0.5rem;
       }
 
+      &:first-child, &:last-child {
+        text-align: right;
+      }
+
       .rating-score {
         > .rating-score-item {
           font-size: 1.25em;
@@ -27,7 +31,7 @@
         // Use position relative to add the option for additional text on top of the bar
         position: relative;
         width: 100%;
-        height: 0.6rem;        
+        height: 0.6rem;
 
         background: $scorecard-progress-background;
         color: $star-color;
