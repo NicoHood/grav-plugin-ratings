@@ -28,6 +28,9 @@ en:
     ACTIVATION_SUCCESS: "Rating successfully activated."
     TOKEN_EXPIRED: "Token expired."
     RATING_ALREADY_ACTIVATED: "Rating was already activated."
+    RATE_NOW: "Rate now"
+    BUILTIN_CSS: 'Use built in CSS'
+    BUILTIN_CSS_HELP: 'Include the CSS provided by the plugin'
 
 de:
   PLUGIN_RATINGS:

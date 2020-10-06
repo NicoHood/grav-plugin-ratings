@@ -77,7 +77,8 @@ class RatingsPlugin extends Plugin
 
         $this->enable([
             'onPageInitialized' => ['onPageInitialized', 1000],
-            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0]
+            'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
         ]);
 
         // Handle activation token links
@@ -109,7 +110,7 @@ class RatingsPlugin extends Plugin
             $this->enable([
                 'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
                 'onFormProcessed' => ['onFormProcessed', 0],
-                'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+                'onTwigSiteVariables' => ['onTwigSiteVariablesWhenActive', 0]
             ]);
         }
     }
@@ -230,11 +231,24 @@ class RatingsPlugin extends Plugin
         }
     }
 
-    public function onTwigSiteVariables() {
+    /**
+     * Only add twig rating variables when the current page is enabled for being rated.
+     */
+    public function onTwigSiteVariablesWhenActive() {
         $path = $this->grav['uri']->path();
         $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
         $this->grav['twig']->twig_vars['ratings'] = $this->grav['ratings']->getActiveModeratedRatings($path);
         $this->grav['twig']->twig_vars['rating_results'] = $this->grav['ratings']->getRatingResults($path);
+    }
+
+    /**
+     * Always add those twig variables and/or assets
+     */
+    public function onTwigSiteVariables()
+    {
+        if ($this->config->get('plugins.ratings.built_in_css')) {
+            $this->grav['assets']->add('plugin://ratings/css-compiled/ratings.min.css');
+        }
     }
 
     /**
