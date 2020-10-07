@@ -34,9 +34,9 @@ class RatingRepository
         }
 
         $query = "INSERT INTO {$this->table_ratings}
-          (page, email, author, date, stars, title, review, activated, moderated, verified, token, expire, lang)
+          (page, email, author, date, stars, title, review, activated, moderated, verified, reported, token, expire, lang)
           VALUES
-          (:page, :email, :author, :date, :stars, :title, :review, :activated, :moderated, :verified, :token, :expire, :lang)";
+          (:page, :email, :author, :date, :stars, :title, :review, :activated, :moderated, :verified, :reported, :token, :expire, :lang)";
 
         $statement = $this->db->prepare($query);
         $statement->bindValue(':page', $rating->page, PDO::PARAM_STR);
@@ -49,6 +49,7 @@ class RatingRepository
         $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
         $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
+        $statement->bindValue(':reported', $rating->reported, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
         $statement->bindValue(':lang', $rating->lang, PDO::PARAM_STR);
@@ -100,6 +101,7 @@ class RatingRepository
               activated = :activated,
               moderated = :moderated,
               verified = :verified,
+              reported = :reported,
               token = :token,
               expire = :expire,
               lang = :lang
@@ -116,6 +118,7 @@ class RatingRepository
         $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
         $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
+        $statement->bindValue(':reported', $rating->reported, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
         $statement->bindValue(':lang', $rating->lang, PDO::PARAM_STR);
@@ -193,7 +196,8 @@ class RatingRepository
               expire INTEGER DEFAULT NULL,
               activated BOOL DEFAULT TRUE NOT NULL,
               moderated BOOL DEFAULT TRUE NOT NULL,
-              verified BOOL DEFAULT FALSE NOT NULL)",
+              verified BOOL DEFAULT FALSE NOT NULL,
+              reported BOOL DEFAULT FALSE NOT NULL)",
         ];
         // TODO add SQL CONSTRAINT to limit starss to 1-5? -> use config value
 
