@@ -45,6 +45,7 @@ form:
           type: text
           validate:
             required: true
+            max: 30
 
         - name: email
           label: PLUGIN_RATINGS.EMAIL_LABEL
@@ -52,6 +53,7 @@ form:
           type: email
           validate:
             required: true
+            max: 255
 
         - name: title
           label: PLUGIN_RATINGS.TITLE_LABEL
@@ -59,6 +61,7 @@ form:
           type: text
           validate:
             required: true
+            max: 100
 
         - name: review
           label: PLUGIN_RATINGS.REVIEW_LABEL
@@ -66,6 +69,7 @@ form:
           type: textarea
           validate:
             required: true
+            max: 10000
 
         - name: date
           type: hidden
