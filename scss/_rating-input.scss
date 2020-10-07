@@ -1,0 +1,59 @@
+// 5 Star Rating
+// Borrowed from: https://codepen.io/jamesbarnett/pen/vlpkh?editors=1100
+
+%full-star {
+  &:after {
+    content: "\f005";
+  }
+};
+
+%empty-star {
+  &:after {
+    content: "\f006";
+  }
+};
+
+.rating-input {
+  border: none;
+  display: inline-flex;
+  flex-direction: row-reverse;
+  margin: 0;
+  padding: 0;
+
+  > input {
+    display: none;
+  }
+
+  > label {
+    font-family: FontAwesome;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    font-size: 1.5em;
+    color: $star-color;
+  }
+
+  > label:after {
+    @extend %empty-star;
+  }
+
+  // Selected star color
+  > input:checked ~ label {
+    @extend %full-star;
+  }
+
+  // On hover color all stars grey by default
+  // NOTE: The order is important here!
+  // This must be after the input:checked statement to override it!
+  &:hover > input + label {
+    @extend %empty-star;
+  }
+
+  // Hover star color
+  // NOTE: This must be after the general .rating:hover to overwrite it
+  // NOTE: The :enabled pseudo element is used to be more specific and overwrite the other states
+  > input:enabled + label:hover,
+  > input:enabled + label:hover ~ input:enabled + label {
+    @extend %full-star;
+  }
+}
