@@ -191,13 +191,14 @@ class Ratings
         $rating = new Rating();
 
         $rating->page = $this->grav['uri']->path();
-        $rating->review = filter_var(urldecode($post['text']), FILTER_SANITIZE_STRING);
-        $rating->author = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
         $rating->email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
+        $rating->author = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
+        $rating->date = time();
+        $rating->title = $post['title'] ? filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING) : NULL;
+        $rating->review = $post['review'] ? filter_var(urldecode($post['review']), FILTER_SANITIZE_STRING) : NULL;
         $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
-        $rating->moderated = !$this->grav['config']->get('moderation');
         $rating->lang = $this->language->getLanguage();
-        // TODO date currently set automatically
+        $rating->moderated = !$this->grav['config']->get('moderation');
 
         // Get email and author from grav login (ignore POST data)
         if (isset($this->grav['user'])) {
@@ -209,9 +210,10 @@ class Ratings
         }
 
         // Calculate expire date
-        $expire_time = (int) $this->config->get('activation_token_expire_time', 604800);
-        $rating->set_expire_time($expire_time);
-
+        if ($this->config->get('email_verification')) {
+            $expire_time = (int) $this->config->get('activation_token_expire_time', 604800);
+            $rating->set_expire_time($expire_time);
+        }
         return $rating;
     }
 

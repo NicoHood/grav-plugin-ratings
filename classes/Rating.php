@@ -10,21 +10,25 @@ class Rating
     public string $page;
     public string $email;
     public string $author;
+    public int $date;
     public int $stars;
-    public string $review;
-    public bool $moderated = true;
+    public ?string $title;
+    public ?string $review;
+    public string $lang;
     public ?string $token = null;
 
     // Absolut time when the token expires
-    // 0 Means it never expires
-    // NULL means the token was validated
+    // NULL Means it never expires
     public ?int $expire = NULL;
-    public string $lang;
-
-    // TODO add date
+    public bool $activated = true;
+    public bool $moderated = true;
+    public bool $verified = false;
 
     function token_expired() : bool {
-        if ($this->expire === 0 || $this->expire === NULL) {
+        if ($this->activated === true) {
+            return true;
+        }
+        else if ($this->expire === NULL) {
             return false;
         }
         else {
@@ -35,13 +39,9 @@ class Rating
     function set_expire_time(int $expire_time) {
         $this->token = md5(uniqid((string)mt_rand(), true));
 
-        // Do not calculate an expire date if unlimited expire time was choosen (expire time is 0)
-        if ($expire_time === 0) {
-            $this->expire = 0;
-        }
-        else {
-            $this->expire = time() + $expire_time;
-        }
+        // Do not calculate an expire date if unlimited expire time was choosen
+        $this->expire = $this->date + $expire_time;
+        $this->activated = false;
     }
 
     function set_expired() {
@@ -50,11 +50,11 @@ class Rating
         $this->expire = 1;
     }
 
-    function token_activated() :bool {
-        return $this->expire === NULL;
+    function token_activated() : bool {
+        return $this->activated === true;
     }
 
     function set_token_activated() {
-        $this->expire = NULL;
+        $this->activated = true;
     }
 }

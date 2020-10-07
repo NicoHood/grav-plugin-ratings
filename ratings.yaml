@@ -53,7 +53,14 @@ form:
           validate:
             required: true
 
-        - name: text
+        - name: title
+          label: PLUGIN_RATINGS.TITLE_LABEL
+          placeholder: PLUGIN_RATINGS.TITLE_PLACEHOLDER
+          type: text
+          validate:
+            required: true
+
+        - name: review
           label: PLUGIN_RATINGS.REVIEW_LABEL
           placeholder: PLUGIN_RATINGS.REVIEW_PLACEHOLDER
           type: textarea
@@ -64,10 +71,6 @@ form:
           type: hidden
           process:
             fillWithCurrentDateTime: true
-
-        - name: title
-          type: hidden
-          evaluateDefault: grav.page.header.title
 
         - name: lang
           type: hidden

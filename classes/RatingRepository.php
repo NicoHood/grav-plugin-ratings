@@ -33,22 +33,26 @@ class RatingRepository
             );
         }
 
-        // TODO date currently set automatically
         $query = "INSERT INTO {$this->table_ratings}
-          (page, email, author, stars, review, moderated, token, expire, lang, date)
+          (page, email, author, date, stars, title, review, activated, moderated, verified, token, expire, lang)
           VALUES
-          (:page, :email, :author, :stars, :review, :moderated, :token, :expire, :lang, datetime('now', 'localtime'))";
+          (:page, :email, :author, :date, :stars, :title, :review, :activated, :moderated, :verified, :token, :expire, :lang)";
 
         $statement = $this->db->prepare($query);
         $statement->bindValue(':page', $rating->page, PDO::PARAM_STR);
         $statement->bindValue(':email', $rating->email, PDO::PARAM_STR);
         $statement->bindValue(':author', $rating->author, PDO::PARAM_STR);
+        $statement->bindValue(':date', $rating->date, PDO::PARAM_INT);
         $statement->bindValue(':stars', $rating->stars, PDO::PARAM_INT);
+        $statement->bindValue(':title', $rating->title, PDO::PARAM_STR);
         $statement->bindValue(':review', $rating->review, PDO::PARAM_STR);
+        $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
+        $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
         $statement->bindValue(':lang', $rating->lang, PDO::PARAM_STR);
+
 
         $statement->execute();
 
@@ -64,8 +68,7 @@ class RatingRepository
         return $rating;
     }
 
-    // TODO specify return type
-    public function read(int $id) {
+    public function read(int $id) : array {
         $query = "SELECT *
           FROM {$this->table_ratings}
           WHERE id = :id";
@@ -74,7 +77,6 @@ class RatingRepository
         $statement->bindValue(':id', $id, PDO::PARAM_STR);
         $statement->execute();
 
-        // TODO this will return an array?
         $results = $statement->fetchAll(PDO::FETCH_CLASS, Rating::class);
         return $results;
     }
@@ -87,14 +89,17 @@ class RatingRepository
             );
         }
 
-        // TODO date missing here
         $query = "UPDATE {$this->table_ratings}
           SET page = :page,
               email = :email,
               author = :author,
+              date = :date,
               stars = :stars,
+              title = :title,
               review = :review,
+              activated = :activated,
               moderated = :moderated,
+              verified = :verified,
               token = :token,
               expire = :expire,
               lang = :lang
@@ -104,9 +109,13 @@ class RatingRepository
         $statement->bindValue(':page', $rating->page, PDO::PARAM_STR);
         $statement->bindValue(':email', $rating->email, PDO::PARAM_STR);
         $statement->bindValue(':author', $rating->author, PDO::PARAM_STR);
+        $statement->bindValue(':date', $rating->date, PDO::PARAM_INT);
         $statement->bindValue(':stars', $rating->stars, PDO::PARAM_INT);
+        $statement->bindValue(':title', $rating->title, PDO::PARAM_STR);
         $statement->bindValue(':review', $rating->review, PDO::PARAM_STR);
+        $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
+        $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
         $statement->bindValue(':lang', $rating->lang, PDO::PARAM_STR);
@@ -176,12 +185,15 @@ class RatingRepository
               stars INTEGER DEFAULT 0 NOT NULL,
               email VARCHAR(255) NOT NULL,
               author VARCHAR(255) NOT NULL,
-              review TEXT NOT NULL,
-              date TEXT NOT NULL,
+              date INTEGER NOT NULL,
+              title VARCHAR(255),
+              review TEXT,
               lang VARCHAR(255) NOT NULL,
               token VARCHAR(255) DEFAULT NULL,
               expire INTEGER DEFAULT NULL,
-              moderated BOOL DEFAULT TRUE)",
+              activated BOOL DEFAULT TRUE NOT NULL,
+              moderated BOOL DEFAULT TRUE NOT NULL,
+              verified BOOL DEFAULT FALSE NOT NULL)",
         ];
         // TODO add SQL CONSTRAINT to limit starss to 1-5? -> use config value
 
