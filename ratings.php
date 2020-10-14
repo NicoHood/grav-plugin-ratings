@@ -190,8 +190,23 @@ class RatingsPlugin extends Plugin
             }
         }
 
+        // The following validation rules only apply to the ratings form, introduced by the ratings plugin.
+        if($event['form']->name !== $this->grav['config']->get('plugins.ratings.form')['name']) {
+            return;
+        }
+
         // Validate if user is allowed to rate
         $rating = $this->grav['ratings']->getRatingFromPostData($event['form']->data());
+
+        // Validate stars itself
+        // NOTE: This is an additional check to the rating field itself, which may have more than 5 stars
+        // The rating plugin itself only supports 5 star ratings.
+        if($rating->stars < 1) {
+            throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING_MIN'));
+        }
+        if($rating->stars > 5) {
+            throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING_MAX'));
+        }
 
         // Check if user voted for this special page already
         if ($this->grav['ratings']->hasAlreadyRated($rating)) {
