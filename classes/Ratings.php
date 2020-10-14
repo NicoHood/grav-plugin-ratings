@@ -164,7 +164,7 @@ class Ratings
         return count($ratings) > 0;
     }
 
-    public function hasReachedRatingLimit($email) : bool {
+    public function hasReachedRatingLimit(Rating $rating) : bool {
         // Skip if there is no limit
         // NOTE: Use a simple check (== instead of ===) as the setting may be null.
         $limit = $this->config->get('rating_pages_limit');
@@ -173,13 +173,19 @@ class Ratings
         }
 
         // Get all rating from this user/email
-        $ratings = $this->rating_repository->find(null, $email);
+        $ratings = $this->rating_repository->find(null, $rating->email);
 
         // NOTE: We also count not yet moderated ratings.
         // NOTE: We also count not yet activated rating
-        $ratings = array_filter($ratings, function(Rating $rating) : bool {
+        $ratings = array_filter($ratings, function(Rating $existing_rating) use($rating) : bool {
+            // Only if a user wants to vote on the same page, that has not been activated
+            // filter this out. He will have the chance to vote again on this page.
+            if ($existing_rating->page === $rating->page && !$existing_rating->token_activated()) {
+                return false;
+            }
+
             // But we do filter out expired tokens
-            return !$rating->token_expired();
+            return !$existing_rating->token_expired() || $existing_rating->token_activated();
         });
 
         return count($ratings) >= $limit;

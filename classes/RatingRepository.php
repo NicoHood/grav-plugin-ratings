@@ -168,7 +168,7 @@ class RatingRepository
             $statement->bindValue(':stars', $stars, PDO::PARAM_INT);
         }
         if (null !== $token) {
-            $statement->bindValue(':token', $token, PDO::PARAM_STRING);
+            $statement->bindValue(':token', $token, PDO::PARAM_STR);
         }
         $statement->execute();
 

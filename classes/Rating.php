@@ -26,10 +26,7 @@ class Rating
     public bool $reported = false;
 
     function token_expired() : bool {
-        if ($this->activated === true) {
-            return true;
-        }
-        else if ($this->expire === NULL) {
+        if ($this->expire === NULL) {
             return false;
         }
         else {
@@ -46,9 +43,8 @@ class Rating
     }
 
     function set_expired() {
-        // Since 0 means never expires, 1 will mark an expired rating
-        // (1 is always < time())
-        $this->expire = 1;
+        // 0 is the very first possible date and marks an expired token
+        $this->expire = 0;
     }
 
     function token_activated() : bool {

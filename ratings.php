@@ -198,7 +198,7 @@ class RatingsPlugin extends Plugin
             throw new ValidationException($language->translate('PLUGIN_RATINGS.ALREADY_RATED'));
         }
 
-        if ($this->grav['ratings']->hasReachedRatingLimit($rating->email)) {
+        if ($this->grav['ratings']->hasReachedRatingLimit($rating)) {
             throw new ValidationException($language->translate('PLUGIN_RATINGS.REACHED_RATING_LIMIT'));
         }
     }
@@ -253,7 +253,6 @@ class RatingsPlugin extends Plugin
 
     /**
      * Handle rating activation
-     * @throws \RuntimeException
      */
     public function handleRatingActivation()
     {
