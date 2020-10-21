@@ -129,6 +129,15 @@ class Ratings
         }
     }
 
+    public function expireAllRatingsByVerificationCode(string $verification_code) {
+        $ratings = $this->rating_repository->find(null, null, null, null, $verification_code);
+
+        foreach ($ratings as $rating) {
+            $rating->set_expired();
+            $this->rating_repository->update($rating);
+        }
+    }
+
     public function getActiveModeratedRatings(string $page) {
         // Search in cache
         $cache_id = $this->getRatingsCacheId($page);
@@ -191,6 +200,18 @@ class Ratings
         return count($ratings) >= $limit;
     }
 
+    public function isVerificationCodeAlreadyUsed(string $verification_code) : bool {
+        // Check if code was used before
+        $ratings = $this->rating_repository->find(null, null, null, null, $verification_code);
+
+        foreach ($ratings as $existing_rating) {
+            if ($existing_rating->token_activated()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // $post should be from $event['form']->data()
     // TODO test what happens if some post data is missing
     public function getRatingFromPostData($post) : Rating {
@@ -205,6 +226,7 @@ class Ratings
         $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
         $rating->lang = $this->language->getLanguage();
         $rating->moderated = !$this->grav['config']->get('moderation');
+        $rating->verification_code = $post['code'] ? preg_replace('/\D/', '', filter_var(urldecode($post['code']), FILTER_SANITIZE_STRING)) : NULL;
 
         // Get email and author from grav login (ignore POST data)
         if (isset($this->grav['user'])) {

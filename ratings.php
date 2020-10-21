@@ -9,6 +9,7 @@ use Grav\Common\Data\ValidationException;
 use Grav\Plugin\Database\PDO;
 use Grav\Plugin\Ratings\Ratings;
 use Grav\Plugin\Ratings\Rating;
+use Grav\Plugin\Ratings\VerificationCodeRepository;
 
 /**
  * Class RatingsPlugin
@@ -78,7 +79,8 @@ class RatingsPlugin extends Plugin
         $this->enable([
             'onPageInitialized' => ['onPageInitialized', 1000],
             'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
-            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+            'onFormProcessed' => ['onVerificationCodeFormProcessed', 0]
         ]);
 
         // Handle activation token links
@@ -88,6 +90,13 @@ class RatingsPlugin extends Plugin
                 // Second event that subscribes onPagesInitialized
                 // to handle email activation token links
                 'onPagesInitialized' => ['handleRatingActivation', 0],
+            ]);
+        }
+        if ($path === $this->config->get('plugins.ratings.route_verification_code')) {
+            $this->enable([
+                // Third event that subscribes onPagesInitialized
+                // to handle verification code links
+                'onPagesInitialized' => ['handleVerificationCode', 0],
             ]);
         }
     }
@@ -216,6 +225,33 @@ class RatingsPlugin extends Plugin
         if ($this->grav['ratings']->hasReachedRatingLimit($rating)) {
             throw new ValidationException($language->translate('PLUGIN_RATINGS.REACHED_RATING_LIMIT'));
         }
+
+        if ($rating->verification_code !== NULL) {
+            if ($this->grav['ratings']->isVerificationCodeAlreadyUsed($rating->verification_code)) {
+                throw new ValidationException($language->translate('PLUGIN_RATINGS.VERIFICATION_CODE_ALREADY_USED'));
+            }
+
+            // Load verification codes from csv file
+            // Parameters explained: search schema, return absolut path, return false if file was not found
+            $csv_path = 'user-data://ratings/verification_codes.csv';
+            $csv_real_path = $this->grav['locator']->findResource($csv_path, true, false);
+
+            // Check if file exists
+            if($csv_real_path === false) {
+                throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_VERIFICATION_CODE'));
+            }
+
+            // Load verification code from csv
+            $verification_code_repository = new VerificationCodeRepository($csv_real_path);
+            $verification_code = $verification_code_repository->getVerificationCode($rating->verification_code);
+
+            if ($verification_code === NULL ||
+                $verification_code['code'] !== $rating->verification_code ||
+                $verification_code['page'] !== $rating->page) {
+                // TODO add delay when code was invalid?
+                throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_VERIFICATION_CODE'));
+            }
+        }
     }
 
     /**
@@ -240,10 +276,91 @@ class RatingsPlugin extends Plugin
                 // Check if there are currently a not yet activated ratings and invalidate those
                 $this->grav['ratings']->expireAllRatings($rating->page, $rating->email);
 
+                // Set verified state (must be validated in onFormValidationProcessed event)
+                if ($rating->verification_code !== null) {
+                    $this->grav['ratings']->expireAllRatingsByVerificationCode($rating->verification_code);
+                    $rating->verified = true;
+                }
+
                 // Add new rating
                 $this->grav['ratings']->addRating($rating);
                 break;
         }
+    }
+
+    /**
+     * Handle form processing instructions.
+     *
+     * @param Event $event
+     */
+    public function onVerificationCodeFormProcessed(Event $event)
+    {
+        $form = $event['form'];
+        $action = $event['action'];
+        $params = $event['params'];
+
+        // TODO If we implement the active flag, the verification processing must be excluded.
+        // It would make sense to move the verification functionality into a separate plugin
+        if (!$this->active) {
+            return;
+        }
+
+        switch ($action) {
+            case 'processVerificationCode':
+                /** @var Message $messages */
+                $messages = $this->grav['messages'];
+
+                $code = $form->value('code');
+                $this->redirectVerificationCodeToPage($code);
+                break;
+        }
+    }
+
+    private function redirectVerificationCodeToPage(?string $code) : bool {
+        $code = preg_replace('/\D/', '', $code);
+
+        /** @var Message $messages */
+        $messages = $this->grav['messages'];
+
+        if ($code === NULL) {
+            $message = $this->grav['language']->translate('PLUGIN_RATINGS.INVALID_VERIFICATION_CODE');
+            $messages->add($message, 'error');
+            return false;
+        }
+
+        // Check if code was already used
+        if ($this->grav['ratings']->isVerificationCodeAlreadyUsed($code)) {
+            $message = $this->grav['language']->translate('PLUGIN_RATINGS.VERIFICATION_CODE_ALREADY_USED');
+            $messages->add($message, 'error');
+            return false;
+        }
+
+        // Load verification codes from csv file
+        // Parameters explained: search schema, return absolut path, return false if file was not found
+        $csv_path = 'user-data://ratings/verification_codes.csv';
+        $csv_real_path = $this->grav['locator']->findResource($csv_path, true, false);
+
+        // Check if file exists
+        if($csv_real_path === false) {
+            return false;
+        }
+
+        // Load verification code from csv
+        $verification_code_repository = new VerificationCodeRepository($csv_real_path);
+        $verification_code = $verification_code_repository->getVerificationCode($code);
+
+        // Code not found
+        if ($verification_code === NULL || $verification_code['page'] === NULL) {
+            $message = $this->grav['language']->translate('PLUGIN_RATINGS.INVALID_VERIFICATION_CODE');
+            $messages->add($message, 'error');
+            return false;
+        }
+
+        // Redirect to the rated page (Add query string and anchor)
+        $redirect_route = $verification_code['page'];
+        $redirect_code = null;
+        $this->grav->redirectLangSafe($redirect_route . '?code=' . $code . $this->config->get('plugins.ratings.form.anchor'), $redirect_code);
+        return true;
     }
 
     /**
@@ -302,6 +419,12 @@ class RatingsPlugin extends Plugin
                 $message = $this->grav['language']->translate('PLUGIN_RATINGS.TOKEN_EXPIRED');
                 $messages->add($message, 'error');
             }
+            // Check if some other user has added a rating with the same verification code in the meantime
+            else if ($rating->verification_code !== NULL &&
+                     $this->grav['ratings']->isVerificationCodeAlreadyUsed($rating->verification_code)) {
+                $message = $this->grav['language']->translate('PLUGIN_RATINGS.VERIFICATION_CODE_ALREADY_USED');
+                $messages->add($message, 'error');
+            }
             else {
                 $this->grav['ratings']->activateRating($rating);
 
@@ -319,6 +442,19 @@ class RatingsPlugin extends Plugin
         $redirect_route = $rating->page;
         $redirect_code = null;
         $this->grav->redirectLangSafe($redirect_route ?: '/', $redirect_code);
+    }
+
+    /**
+     * Handle verification code links
+     */
+    public function handleVerificationCode()
+    {
+        /** @var Uri $uri */
+        $uri = $this->grav['uri'];
+
+        // URL Parameter
+        $code = $uri->param('code');
+        $this->redirectVerificationCodeToPage($code);
     }
 
     /**

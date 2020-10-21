@@ -23,6 +23,7 @@ class Rating
     public bool $activated = true;
     public bool $moderated = true;
     public bool $verified = false;
+    public ?string $verification_code = NULL;
     public bool $reported = false;
 
     function token_expired() : bool {

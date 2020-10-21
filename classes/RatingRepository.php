@@ -34,9 +34,9 @@ class RatingRepository
         }
 
         $query = "INSERT INTO {$this->table_ratings}
-          (page, email, author, date, stars, title, review, activated, moderated, verified, reported, token, expire, lang)
+          (page, email, author, date, stars, title, review, activated, moderated, verified, reported, token, expire, lang, verification_code)
           VALUES
-          (:page, :email, :author, :date, :stars, :title, :review, :activated, :moderated, :verified, :reported, :token, :expire, :lang)";
+          (:page, :email, :author, :date, :stars, :title, :review, :activated, :moderated, :verified, :reported, :token, :expire, :lang, :verification_code)";
 
         $statement = $this->db->prepare($query);
         $statement->bindValue(':page', $rating->page, PDO::PARAM_STR);
@@ -53,8 +53,7 @@ class RatingRepository
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
         $statement->bindValue(':lang', $rating->lang, PDO::PARAM_STR);
-
-
+        $statement->bindValue(':verification_code', $rating->verification_code, PDO::PARAM_STR);
         $statement->execute();
 
         // TODO Is the following thread safe???
@@ -104,7 +103,8 @@ class RatingRepository
               reported = :reported,
               token = :token,
               expire = :expire,
-              lang = :lang
+              lang = :lang,
+              verification_code = :verification_code
           WHERE id = :id";
         $statement = $this->db->prepare($query);
         $statement->bindValue(':id', $rating->id, PDO::PARAM_STR);
@@ -122,6 +122,7 @@ class RatingRepository
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
         $statement->bindValue(':lang', $rating->lang, PDO::PARAM_STR);
+        $statement->bindValue(':verification_code', $rating->verification_code, PDO::PARAM_STR);
 
         $statement->execute();
     }
@@ -139,7 +140,7 @@ class RatingRepository
     }
 
     public function find(?string $page = null, ?string $email = null,
-      ?int $stars = null, ?string $token = null) {
+      ?int $stars = null, ?string $token = null, ?string $verification_code = null) {
         $query = "SELECT *
           FROM {$this->table_ratings}
           WHERE TRUE";
@@ -156,6 +157,9 @@ class RatingRepository
         if (null !== $token) {
             $query .= ' AND token = :token';
         }
+        if (null !== $verification_code) {
+            $query .= ' AND verification_code = :verification_code';
+        }
 
         $statement = $this->db->prepare($query);
         if (null !== $page) {
@@ -169,6 +173,9 @@ class RatingRepository
         }
         if (null !== $token) {
             $statement->bindValue(':token', $token, PDO::PARAM_STR);
+        }
+        if (null !== $verification_code) {
+            $statement->bindValue(':verification_code', $verification_code, PDO::PARAM_STR);
         }
         $statement->execute();
 
@@ -197,7 +204,8 @@ class RatingRepository
               activated BOOL DEFAULT TRUE NOT NULL,
               moderated BOOL DEFAULT TRUE NOT NULL,
               verified BOOL DEFAULT FALSE NOT NULL,
-              reported BOOL DEFAULT FALSE NOT NULL)",
+              reported BOOL DEFAULT FALSE NOT NULL,
+              verification_code VARCHAR(255) DEFAULT NULL)"
         ];
         // TODO add SQL CONSTRAINT to limit starss to 1-5? -> use config value
 

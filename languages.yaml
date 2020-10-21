@@ -33,6 +33,8 @@ en:
     RATE_NOW: "Rate now"
     BUILTIN_CSS: 'Use built in CSS'
     BUILTIN_CSS_HELP: 'Include the CSS provided by the plugin'
+    INVALID_VERIFICATION_CODE: 'Invalid verification code.'
+    VERIFICATION_CODE_ALREADY_USED: 'Verification code already used.'
 
 de:
   PLUGIN_RATINGS:
@@ -67,3 +69,5 @@ de:
     TOKEN_EXPIRED: "Token abgelaufen."
     RATING_ALREADY_ACTIVATED: "Diese Bewertung wurde bereits erfolgreich aktiviert."
     RATE_NOW: "Jetzt Bewerten"
+    INVALID_VERIFICATION_CODE: 'Ungültiger Verifizierungscode.'
+    VERIFICATION_CODE_ALREADY_USED: 'Verifizierungscode bereits verwendet.'
