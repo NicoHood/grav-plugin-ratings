@@ -191,7 +191,7 @@ class RatingsPlugin extends Plugin
         }
 
         // The following validation rules only apply to the ratings form, introduced by the ratings plugin.
-        if($event['form']->name !== $this->grav['config']->get('plugins.ratings.form')['name']) {
+        if($event['form']->name !== $this->grav['config']->get('plugins.ratings.form.name')) {
             return;
         }
 

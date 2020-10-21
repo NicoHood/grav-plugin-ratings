@@ -21,6 +21,7 @@ class Ratings
     /** @var Cache $cache */
     protected $cache;
 
+    /** @var Config $config */
     protected $config;
     protected $path = 'user-data://ratings';
     protected $db_name = 'ratings.db';
@@ -220,6 +221,7 @@ class Ratings
             $expire_time = (int) $this->config->get('activation_token_expire_time', 604800);
             $rating->set_expire_time($expire_time);
         }
+
         return $rating;
     }
 
