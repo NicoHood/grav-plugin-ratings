@@ -1,6 +1,7 @@
 enabled: true
 
 built_in_css: true
+add_microdata: false
 
 # New ratings must be moderated by the admin
 moderation: false
