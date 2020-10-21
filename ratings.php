@@ -132,7 +132,11 @@ class RatingsPlugin extends Plugin
             return;
         }
 
-        // TODO merge configs and then also check for the active flag per page
+        // Merge configs and then also check for the active flag per page
+        $config = $this->mergeConfig($page);
+        if (!$config->get('active')) {
+            return;
+        }
 
         // Filter page template
         if (!empty($enable_on_templates)) {
