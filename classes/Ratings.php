@@ -204,7 +204,10 @@ class Ratings
         $rating->title = $post['title'] ? filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING) : NULL;
         $rating->review = $post['review'] ? filter_var(urldecode($post['review']), FILTER_SANITIZE_STRING) : NULL;
         $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
-        $rating->lang = $this->language->getLanguage();
+        // NOTE: system.languages.supported must be set in order to get a correct language.
+        if($this->language->enabled()) {
+            $rating->lang = $this->language->getLanguage();
+        }
         $rating->moderated = !$this->grav['config']->get('moderation');
 
         // Get email and author from grav login (ignore POST data)

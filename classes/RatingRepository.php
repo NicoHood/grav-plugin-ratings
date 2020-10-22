@@ -54,7 +54,6 @@ class RatingRepository
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
         $statement->bindValue(':lang', $rating->lang, PDO::PARAM_STR);
 
-
         $statement->execute();
 
         // TODO Is the following thread safe???
@@ -194,7 +193,7 @@ class RatingRepository
               date INTEGER NOT NULL,
               title VARCHAR(255),
               review TEXT,
-              lang VARCHAR(255) NOT NULL,
+              lang VARCHAR(255) DEFAULT NULL,
               token VARCHAR(255) DEFAULT NULL,
               expire INTEGER DEFAULT NULL,
               activated BOOL DEFAULT TRUE NOT NULL,
