@@ -140,9 +140,12 @@ class RatingRepository
 
     public function find(?string $page = null, ?string $email = null,
       ?int $stars = null, ?string $token = null) {
+        // NOTE: "WHERE 1" is used as dummy to use the AND construct below.
+        // Normally "WHERE TRUE" would be nicer, introduced by SQLite 3.23.
+        // However some servers are still running debian stretch with SQLite 3.16.
         $query = "SELECT *
           FROM {$this->table_ratings}
-          WHERE TRUE";
+          WHERE 1";
 
         if (null !== $page) {
             $query .= ' AND page = :page';
