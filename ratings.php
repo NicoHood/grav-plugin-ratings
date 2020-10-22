@@ -261,11 +261,8 @@ class RatingsPlugin extends Plugin
 
         // Add SEO microdata
         if($this->enable && $this->config->get('plugins.ratings.add_microdata', false)) {
-            $ratings_json_ld = $this->grav['twig']->processTemplate('partials/ratings-json-ld.html.twig');
-            // NOTE: We need to add a little hack here, sine the addInlineJs() function
-            // surrounds our json-ld code with "normal" <script> tags.
-            $ratings_json_ld_script = '</script>' . $ratings_json_ld . '<script>';
-            $this->grav['assets']->addInlineJs($ratings_json_ld_script, 100);
+            $ratings_json_ld = $this->grav['twig']->processTemplate('partials/ratings-json-ld.json.twig');
+            $this->grav['assets']->addInlineJs($ratings_json_ld, ['type' => 'application/ld+json']);
         }
 
     }

@@ -1,16 +1,5 @@
 {% if enable_ratings_plugin %}
-  {% set id = id|default(uri.url ~ '#ratings') %}
-
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org/",
-    "@id": "{{ id }}",
-
-    "@type": "AggregateRating",
-    "ratingValue": "{{ rating_results.average }}",
-    "ratingCount": "{{ rating_results.count }}",
-    "bestRating": {{ rating_results.max }},
-    "worstRating": {{ rating_results.min }}
-  }
+    {% include 'partials/ratings-json-ld.json.twig' with {'id': id} %}
   </script>
 {% endif %}
