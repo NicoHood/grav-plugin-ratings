@@ -1,18 +1,5 @@
 // 5 Star Rating
 // Borrowed from: https://codepen.io/jamesbarnett/pen/vlpkh?editors=1100
-
-%full-star {
-  &:after {
-    content: "\f005";
-  }
-};
-
-%empty-star {
-  &:after {
-    content: "\f006";
-  }
-};
-
 .rating-input {
   border: none;
   display: inline-flex;
@@ -25,7 +12,6 @@
   }
 
   > label {
-    font-family: FontAwesome;
     display: inline-block;
     margin: 0;
     padding: 0;

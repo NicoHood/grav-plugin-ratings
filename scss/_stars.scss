@@ -1,0 +1,20 @@
+%full-star {
+  &:after {
+    font-family: "FontAwesome";
+    content: "\f005";
+  }
+};
+
+%half-star {
+  &:after {
+    font-family: "FontAwesome";
+    content: "\f123";
+  }
+};
+
+%empty-star {
+  &:after {
+    font-family: "FontAwesome";
+    content: "\f006";
+  }
+};

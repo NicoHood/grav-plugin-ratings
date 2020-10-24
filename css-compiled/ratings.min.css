@@ -1,12 +1,12 @@
-.rating-input > input:enabled + label:hover:after, .rating-input > input:enabled + label:hover ~ input:enabled + label:after, .rating-input > input:checked ~ label:after, .rating-score[data-rating='5.5'] .rating-score-item:nth-child(-n + 5):after, .rating-score[data-rating='5'] .rating-score-item:nth-child(-n + 5):after, .rating-score[data-rating='4.5'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='4'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='3.5'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='3'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='2.5'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='2'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='1.5'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='1'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='0.5'] .rating-score-item:nth-child(-n + 0):after, .rating-score[data-rating='0'] .rating-score-item:nth-child(-n + 0):after { content: "\f005"; }
+.rating-input > input:enabled + label:hover:after, .rating-input > input:enabled + label:hover ~ input:enabled + label:after, .rating-input > input:checked ~ label:after, .rating-score[data-rating='5.5'] .rating-score-item:nth-child(-n + 5):after, .rating-score[data-rating='5'] .rating-score-item:nth-child(-n + 5):after, .rating-score[data-rating='4.5'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='4'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='3.5'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='3'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='2.5'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='2'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='1.5'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='1'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='0.5'] .rating-score-item:nth-child(-n + 0):after, .rating-score[data-rating='0'] .rating-score-item:nth-child(-n + 0):after { font-family: "FontAwesome"; content: "\f005"; }
 
-.rating-score[data-rating='5.5'] .rating-score-item:nth-child(6):after, .rating-score[data-rating='4.5'] .rating-score-item:nth-child(5):after, .rating-score[data-rating='3.5'] .rating-score-item:nth-child(4):after, .rating-score[data-rating='2.5'] .rating-score-item:nth-child(3):after, .rating-score[data-rating='1.5'] .rating-score-item:nth-child(2):after, .rating-score[data-rating='0.5'] .rating-score-item:nth-child(1):after { content: "\f123"; }
+.rating-score[data-rating='5.5'] .rating-score-item:nth-child(6):after, .rating-score[data-rating='4.5'] .rating-score-item:nth-child(5):after, .rating-score[data-rating='3.5'] .rating-score-item:nth-child(4):after, .rating-score[data-rating='2.5'] .rating-score-item:nth-child(3):after, .rating-score[data-rating='1.5'] .rating-score-item:nth-child(2):after, .rating-score[data-rating='0.5'] .rating-score-item:nth-child(1):after { font-family: "FontAwesome"; content: "\f123"; }
 
-.rating-input:hover > input + label:after, .rating-input > label:after, .rating-score .rating-score-item:after { content: "\f006"; }
+.rating-input:hover > input + label:after, .rating-input > label:after, .rating-score .rating-score-item:after { font-family: "FontAwesome"; content: "\f006"; }
 
 .rating-score { display: inline-flex; flex-direction: row; align-items: flex-start; margin: 0; padding: 0; color: #FFC600; }
 
-.rating-score .rating-score-item { font-size: inherit; margin: 0; padding: 0; display: block; font-family: FontAwesome; }
+.rating-score .rating-score-item { font-size: inherit; margin: 0; padding: 0; display: block; }
 
 .ratings-summary { display: flex; flex-direction: column; align-items: center; }
 
@@ -34,12 +34,8 @@
 
 .ratings-scorecard .ratings-scorecard-item > div progress::-moz-progress-bar { background: #FFC600; border-radius: 0.1rem; }
 
-.rating-input > input:enabled + label:hover:after, .rating-input > input:enabled + label:hover ~ input:enabled + label:after, .rating-input > input:checked ~ label:after, .rating-score[data-rating='0'] .rating-score-item:nth-child(-n + 0):after, .rating-score[data-rating='0.5'] .rating-score-item:nth-child(-n + 0):after, .rating-score[data-rating='1'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='1.5'] .rating-score-item:nth-child(-n + 1):after, .rating-score[data-rating='2'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='2.5'] .rating-score-item:nth-child(-n + 2):after, .rating-score[data-rating='3'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='3.5'] .rating-score-item:nth-child(-n + 3):after, .rating-score[data-rating='4'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='4.5'] .rating-score-item:nth-child(-n + 4):after, .rating-score[data-rating='5'] .rating-score-item:nth-child(-n + 5):after, .rating-score[data-rating='5.5'] .rating-score-item:nth-child(-n + 5):after { content: "\f005"; }
-
-.rating-input:hover > input + label:after, .rating-input > label:after, .rating-score .rating-score-item:after { content: "\f006"; }
-
 .rating-input { border: none; display: inline-flex; flex-direction: row-reverse; margin: 0; padding: 0; }
 
 .rating-input > input { display: none; }
 
-.rating-input > label { font-family: FontAwesome; display: inline-block; margin: 0; padding: 0; font-size: 1.5em; color: #FFC600; }
+.rating-input > label { display: inline-block; margin: 0; padding: 0; font-size: 1.5em; color: #FFC600; }

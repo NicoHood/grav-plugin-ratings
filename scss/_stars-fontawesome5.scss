@@ -1,0 +1,23 @@
+%full-star {
+  &:after {
+    font-family: "Font Awesome 5 Pro", "Line Awesome Free";
+    font-weight: 900;
+    content: "\f005";
+  }
+};
+
+%half-star {
+  &:after {
+    font-family: "Font Awesome 5 Pro", "Line Awesome Free";
+    font-weight: 900;
+    content: "\f5c0";
+  }
+};
+
+%empty-star {
+  &:after {
+    font-family: "Font Awesome 5 Pro", "Line Awesome Free";
+    font-weight: 400;
+    content: "\f005";
+  }
+};
