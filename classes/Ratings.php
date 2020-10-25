@@ -98,21 +98,26 @@ class Ratings
         $param_sep = $system_config->get('system.param_sep', ':');
         $activation_link = $this->grav['base_url_absolute'] . $this->config->get('route_activate') . '/token' . $param_sep . $rating->token;
 
-        $site_name = $system_config->get('site.title', 'Website');
-        $site_link = $this->grav['base_url_absolute'];
-        $author = $system_config->get('site.author.name', '');
-        $fullname = $rating->author;
-
+        $site_name = $system_config->get('site.title', $this->grav['base_url_absolute']);
         $subject = $this->language->translate(['PLUGIN_RATINGS.ACTIVATION_EMAIL_SUBJECT', $site_name]);
-        $content = $this->language->translate(['PLUGIN_RATINGS.ACTIVATION_EMAIL_BODY',
-            $fullname,
-            $activation_link,
-            $site_name,
-            $author,
-            $site_link
-        ]);
-        $to = $rating->email;
-        $sent = EmailUtils::sendEmail($subject, $content, $to);
+
+        /** @var Email $email */
+        $email = $this->grav['Email'];
+
+        $params = [
+            'subject' => $subject,
+            'body' => '',
+            'template' => 'email/activate_rating.html.twig',
+            'to' => $rating->email,
+            'content_type' => 'text/html'];
+
+        $template_vars = [
+          'rating' => $rating,
+          'activation_link' => $activation_link
+        ];
+
+        $message = $email->buildMessage($params, $template_vars);
+        $sent = $email->send($message);
 
         if ($sent < 1) {
             throw new \RuntimeException($this->language->translate('PLUGIN_RATINGS.EMAIL_SENDING_FAILURE'));
