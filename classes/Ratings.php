@@ -53,6 +53,8 @@ class Ratings
         // Clear cache
         $cache_id = $this->getRatingsCacheId($rating->page);
         $this->cache->delete($cache_id);
+        $cache_id = $this->getRatingResultsCacheId($rating->page);
+        $this->cache->delete($cache_id);
 
         if($rating->token) {
             $this->sendActivationEmail($rating);
@@ -78,6 +80,8 @@ class Ratings
 
         // Clear cache
         $cache_id = $this->getRatingsCacheId($rating->page);
+        $this->cache->delete($cache_id);
+        $cache_id = $this->getRatingResultsCacheId($rating->page);
         $this->cache->delete($cache_id);
 
         return $rating;
