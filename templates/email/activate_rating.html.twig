@@ -1,0 +1,36 @@
+{% extends 'email/base.html.twig' %}
+
+{% block content %}
+  <h1>{{ 'PLUGIN_RATINGS.EMAIL_HEADLINE'|t }}</h1>
+  <p>{{ 'PLUGIN_RATINGS.EMAIL_GREETING'|t(rating.author) }} </p>
+  <p>
+    {{ 'PLUGIN_RATINGS.EMAIL_MESSAGE'|t('<b><a href="' ~ base_url_absolute ~ '">' ~ site.title ~ '</a></b>') }}
+  </p>
+  <p>
+    <br/>
+    <a href="{{ activation_link }}" class="btn-primary">
+      {{ 'PLUGIN_RATINGS.EMAIL_ACTIVATE_BUTTON'|t }}
+    </a>
+    <br/>
+    <br/>
+  </p>
+  <p>
+    {{ 'PLUGIN_RATINGS.EMAIL_ACTIVATION_ALTERNATIVE'|t }}
+  </p>
+  <p class="word-break"><a href="{{ activation_link }}">{{ activation_link }}</a></p>
+
+  {# Optional, additional content. Normally not used #}
+  {{ content|raw }}
+
+  <p>
+    <br/>
+    {{ 'PLUGIN_RATINGS.EMAIL_KIND_REGARDS'|t }}
+    <br/>
+    <br/>
+    {{ site.author.name }}
+  </p>
+{% endblock content %}
+
+{% block footer %}
+  {{ site.title|defined('PLUGIN_EMAIL.EMAIL_FOOTER')|t|e }}
+{% endblock %}

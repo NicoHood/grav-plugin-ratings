@@ -21,6 +21,7 @@ class Ratings
     /** @var Cache $cache */
     protected $cache;
 
+    /** @var Config $config */
     protected $config;
     protected $path = 'user-data://ratings';
     protected $db_name = 'ratings.db';
@@ -52,6 +53,8 @@ class Ratings
         // Clear cache
         $cache_id = $this->getRatingsCacheId($rating->page);
         $this->cache->delete($cache_id);
+        $cache_id = $this->getRatingResultsCacheId($rating->page);
+        $this->cache->delete($cache_id);
 
         if($rating->token) {
             $this->sendActivationEmail($rating);
@@ -78,6 +81,8 @@ class Ratings
         // Clear cache
         $cache_id = $this->getRatingsCacheId($rating->page);
         $this->cache->delete($cache_id);
+        $cache_id = $this->getRatingResultsCacheId($rating->page);
+        $this->cache->delete($cache_id);
 
         return $rating;
     }
@@ -97,21 +102,26 @@ class Ratings
         $param_sep = $system_config->get('system.param_sep', ':');
         $activation_link = $this->grav['base_url_absolute'] . $this->config->get('route_activate') . '/token' . $param_sep . $rating->token;
 
-        $site_name = $system_config->get('site.title', 'Website');
-        $site_link = $this->grav['base_url_absolute'];
-        $author = $system_config->get('site.author.name', '');
-        $fullname = $rating->author;
-
+        $site_name = $system_config->get('site.title', $this->grav['base_url_absolute']);
         $subject = $this->language->translate(['PLUGIN_RATINGS.ACTIVATION_EMAIL_SUBJECT', $site_name]);
-        $content = $this->language->translate(['PLUGIN_RATINGS.ACTIVATION_EMAIL_BODY',
-            $fullname,
-            $activation_link,
-            $site_name,
-            $author,
-            $site_link
-        ]);
-        $to = $rating->email;
-        $sent = EmailUtils::sendEmail($subject, $content, $to);
+
+        /** @var Email $email */
+        $email = $this->grav['Email'];
+
+        $params = [
+            'subject' => $subject,
+            'body' => '',
+            'template' => 'email/activate_rating.html.twig',
+            'to' => $rating->email,
+            'content_type' => 'text/html'];
+
+        $template_vars = [
+          'rating' => $rating,
+          'activation_link' => $activation_link
+        ];
+
+        $message = $email->buildMessage($params, $template_vars);
+        $sent = $email->send($message);
 
         if ($sent < 1) {
             throw new \RuntimeException($this->language->translate('PLUGIN_RATINGS.EMAIL_SENDING_FAILURE'));
@@ -224,7 +234,10 @@ class Ratings
         $rating->title = $post['title'] ? filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING) : NULL;
         $rating->review = $post['review'] ? filter_var(urldecode($post['review']), FILTER_SANITIZE_STRING) : NULL;
         $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
-        $rating->lang = $this->language->getLanguage();
+        // NOTE: system.languages.supported must be set in order to get a correct language.
+        if($this->language->enabled()) {
+            $rating->lang = $this->language->getLanguage();
+        }
         $rating->moderated = !$this->grav['config']->get('moderation');
         $rating->verification_code = $post['code'] ? preg_replace('/\D/', '', filter_var(urldecode($post['code']), FILTER_SANITIZE_STRING)) : NULL;
 
@@ -242,6 +255,7 @@ class Ratings
             $expire_time = (int) $this->config->get('activation_token_expire_time', 604800);
             $rating->set_expire_time($expire_time);
         }
+
         return $rating;
     }
 

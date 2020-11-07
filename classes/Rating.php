@@ -14,7 +14,7 @@ class Rating
     public int $stars;
     public ?string $title;
     public ?string $review;
-    public string $lang;
+    public ?string $lang = null;
     public ?string $token = null;
 
     // Absolut time when the token expires

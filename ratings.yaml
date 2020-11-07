@@ -1,6 +1,13 @@
 enabled: true
+active: true
 
 built_in_css: true
+# Builtin css uses fontawesome4 icons by default.
+# Using fontawesome5 requires pro icons.
+# You can also use line-awesome 1.3.0 or newer
+# which is fontawesome5 compatible and for free.
+font_awesome_5: false
+add_json_ld: false
 
 # New ratings must be moderated by the admin
 moderation: false

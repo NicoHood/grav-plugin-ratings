@@ -5,6 +5,7 @@ use Composer\Autoload\ClassLoader;
 use Grav\Common\Plugin;
 use Grav\Common\Utils;
 use RocketTheme\Toolbox\Event\Event;
+use Grav\Common\Data\Data;
 use Grav\Common\Data\ValidationException;
 use Grav\Plugin\Database\PDO;
 use Grav\Plugin\Ratings\Ratings;
@@ -80,7 +81,8 @@ class RatingsPlugin extends Plugin
             'onPageInitialized' => ['onPageInitialized', 1000],
             'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
             'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
-            'onFormProcessed' => ['onVerificationCodeFormProcessed', 0]
+            'onFormProcessed' => ['onVerificationCodeFormProcessed', 0],
+            'onTwigInitialized' => ['onTwigInitialized', 0]
         ]);
 
         // Handle activation token links
@@ -119,7 +121,7 @@ class RatingsPlugin extends Plugin
             $this->enable([
                 'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
                 'onFormProcessed' => ['onFormProcessed', 0],
-                'onTwigSiteVariables' => ['onTwigSiteVariablesWhenActive', 0]
+                'onTwigSiteVariables' => ['onTwigSiteVariablesWhenActive', 100]
             ]);
         }
     }
@@ -141,7 +143,11 @@ class RatingsPlugin extends Plugin
             return;
         }
 
-        // TODO merge configs and then also check for the active flag per page
+        // Merge configs and then also check for the active flag per page
+        $config = $this->mergeConfig($page);
+        if (!$config->get('active')) {
+            return;
+        }
 
         // Filter page template
         if (!empty($enable_on_templates)) {
@@ -200,7 +206,7 @@ class RatingsPlugin extends Plugin
         }
 
         // The following validation rules only apply to the ratings form, introduced by the ratings plugin.
-        if($event['form']->name !== $this->grav['config']->get('plugins.ratings.form')['name']) {
+        if($event['form']->name !== $this->grav['config']->get('plugins.ratings.form.name')) {
             return;
         }
 
@@ -368,9 +374,55 @@ class RatingsPlugin extends Plugin
      */
     public function onTwigSiteVariablesWhenActive() {
         $path = $this->grav['uri']->path();
+        $page = $this->grav['page'];
+
         $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
         $this->grav['twig']->twig_vars['ratings'] = $this->grav['ratings']->getActiveModeratedRatings($path);
-        $this->grav['twig']->twig_vars['rating_results'] = $this->grav['ratings']->getRatingResults($path);
+        $results = $this->grav['ratings']->getRatingResults($path);
+        $this->grav['twig']->twig_vars['rating_results'] = $results;
+
+        // Add SEO structured data
+        $config = $this->mergeConfig($page);
+        $schema = $config->get('add_json_ld', false);
+        if($this->enable && $results['count'] > 0 && $schema) {
+            // Check plugin dependency
+            if (!$this->config->get('plugins.structured-data.enabled')) {
+                throw new \RuntimeException($this->grav['language']->translate('Plugin "structured-data" not enabled/installed. Unable to add json-ld.'));
+            }
+
+            $header = new Data((array)$page->header());
+
+            // Prepare new data for structured-data plugin
+            $data = [
+              'value' => $results['average'],
+              'count' => $results['count'],
+              'best' => $results['max'],
+              'worst' => $results['min']
+            ];
+
+            // The rating can be added as general schema (and referenced via its id)
+            // Or the rating can be attached to another schema, like a local_business.
+            if ($schema === true) {
+                $data['add_json_ld'] = true;
+                $header->set('structured-data.aggregate_rating', $data);
+            }
+            else {
+                $header->set('structured-data.' . $schema . '.aggregate_rating', $data);
+            }
+
+            // Set new header
+            $page->header($header);
+        }
+    }
+
+    /**
+     * Add Twig function
+     */
+    public function onTwigInitialized()
+    {
+        $this->grav['twig']->twig()->addFunction(
+            new \Twig_SimpleFunction('rating_results', [$this->grav['ratings'], 'getRatingResults'])
+        );
     }
 
     /**
@@ -379,7 +431,12 @@ class RatingsPlugin extends Plugin
     public function onTwigSiteVariables()
     {
         if ($this->config->get('plugins.ratings.built_in_css')) {
-            $this->grav['assets']->add('plugin://ratings/css-compiled/ratings.min.css');
+            if ($this->config->get('plugins.ratings.font_awesome_5', false)) {
+                $this->grav['assets']->add('plugin://ratings/css-compiled/ratings-font-awesome-5.min.css');
+            }
+            else {
+                $this->grav['assets']->add('plugin://ratings/css-compiled/ratings.min.css');
+            }
         }
     }
 
