@@ -79,7 +79,8 @@ class RatingsPlugin extends Plugin
         $this->enable([
             'onPageInitialized' => ['onPageInitialized', 1000],
             'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
-            'onTwigSiteVariables' => ['onTwigSiteVariables', 0]
+            'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+            'onTwigInitialized' => ['onTwigInitialized', 0]
         ]);
 
         // Handle activation token links
@@ -295,6 +296,16 @@ class RatingsPlugin extends Plugin
             // Set new header
             $page->header($header);
         }
+    }
+
+    /**
+     * Add Twig function
+     */
+    public function onTwigInitialized()
+    {
+        $this->grav['twig']->twig()->addFunction(
+            new \Twig_SimpleFunction('rating_results', [$this->grav['ratings'], 'getRatingResults'])
+        );
     }
 
     /**
