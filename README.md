@@ -23,7 +23,7 @@ To install the plugin manually, download the zip-version of this repository and 
 You should now have all the plugin files under
 
     /your/site/grav/user/plugins/ratings
-	
+
 > NOTE: This plugin is a modular component for Grav which may require other plugins to operate, please see its [blueprints.yaml-file on GitHub](https://github.com/nicohood/grav-plugin-ratings/blob/master/blueprints.yaml).
 
 ### Admin Plugin
@@ -44,7 +44,33 @@ Note that if you use the Admin Plugin, a file with your configuration named rati
 
 ## Usage
 
-**Describe how to use the plugin.**
+##### Requirements:
+
+* SQLite >=3.16 (Debian Stretch or newer)
+* [Database Plugin](https://github.com/getgrav/grav-plugin-database)
+* [Form Plugin](https://github.com/getgrav/grav-plugin-form)
+* [Email Plugin](https://github.com/getgrav/grav-plugin-email)
+* Grav >=1.6
+* A theme with FontAwesome4, FontAwesome5 oder LineAwesome icon support
+* The [session](https://learn.getgrav.org/16/basics/grav-configuration#session) feature in `system.yaml` must be enabled.
+
+##### Optional:
+
+* [Structured Data Plugin (json-ld support)](https://github.com/NicoHood/grav-plugin-structured-data)
+
+#### Language support
+
+It is recommented to set supported languages in `system.yaml` in order to save the language code of the user inside the rating (even if you do not yet use more than one language):
+
+```yaml
+languages:
+  translations: true
+  http_accept_language: true
+  include_default_lang: false
+  default_lang: en
+  supported:
+   - en
+```
 
 ## Credits
 
