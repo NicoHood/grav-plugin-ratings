@@ -303,7 +303,7 @@ class RatingsPlugin extends Plugin
     public function onTwigSiteVariables()
     {
         if ($this->config->get('plugins.ratings.built_in_css')) {
-            if ($this->config->get('plugins.ratings.font-awesome-5', false)) {
+            if ($this->config->get('plugins.ratings.font_awesome_5', false)) {
                 $this->grav['assets']->add('plugin://ratings/css-compiled/ratings-font-awesome-5.min.css');
             }
             else {
