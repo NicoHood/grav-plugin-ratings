@@ -269,8 +269,8 @@ class RatingsPlugin extends Plugin
         $schema = $config->get('add_json_ld', false);
         if($this->enable && $results['count'] > 0 && $schema) {
             // Check plugin dependency
-            if (!$this->config->get('plugins.structured-data.enabled')) {
-                throw new \RuntimeException($this->grav['language']->translate('Plugin "structured-data" not enabled/installed. Unable to add json-ld.'));
+            if (!$this->config->get('plugins.seo.enabled')) {
+                throw new \RuntimeException($this->grav['language']->translate('Plugin "seo" not enabled/installed. Unable to add json-ld.'));
             }
 
             $header = new Data((array)$page->header());
@@ -286,15 +286,15 @@ class RatingsPlugin extends Plugin
             // The rating can be added as general schema (and referenced via its id)
             // Or the rating can be attached to another schema, like a local_business.
             if ($schema === true) {
-                $data['add_json_ld'] = true;
-                $header->set('structured-data.aggregate_rating', $data);
+                $header->set('seo.aggregate_rating.add_json_ld', true);
+                $header->set('structured_data.aggregate_rating', $data);
             }
             else {
-                $header->set('structured-data.' . $schema . '.aggregate_rating', $data);
+                $header->set('structured_data.' . $schema . '.aggregate_rating', $data);
             }
 
             // Set new header
-            $page->header($header);
+            $page->header($header->toArray());
         }
     }
 

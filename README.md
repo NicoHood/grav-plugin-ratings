@@ -56,7 +56,7 @@ Note that if you use the Admin Plugin, a file with your configuration named rati
 
 ##### Optional:
 
-* [Structured Data Plugin (json-ld support)](https://github.com/NicoHood/grav-plugin-structured-data)
+* [NicoHood's Seo Plugin (json-ld support)](https://github.com/NicoHood/grav-plugin-seo)
 
 #### Language support
 
