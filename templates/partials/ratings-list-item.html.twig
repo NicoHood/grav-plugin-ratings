@@ -4,7 +4,7 @@
       {{ rating.author|e }}
     </div>
     <div class="card-subtitle text-gray">
-      <ul class="rating-score" data-rating="{{ rating.stars }}">
+      <ul class="rating-score" data-rating="{{ rating.stars|e }}">
         <li class="rating-score-item"></li>
         <li class="rating-score-item"></li>
         <li class="rating-score-item"></li>
@@ -18,10 +18,10 @@
   </div>
   <div class="card-body">
     {% if rating.title %}
-      <h6 style="margin: 0; font-weight: bold;">{{ rating.title }}</h6>
+      <h6 style="margin: 0; font-weight: bold;">{{ rating.title|e }}</h6>
     {% endif %}
     <p>
-      {{ rating.review }}
+      {{ rating.review|e }}
     </p>
   </div>
 </div>

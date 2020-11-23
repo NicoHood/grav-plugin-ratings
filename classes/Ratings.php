@@ -207,11 +207,11 @@ class Ratings
         $rating = new Rating();
 
         $rating->page = $this->grav['uri']->path();
-        $rating->email = filter_var(urldecode($post['email']), FILTER_SANITIZE_STRING);
-        $rating->author = filter_var(urldecode($post['name']), FILTER_SANITIZE_STRING);
+        $rating->email = strip_tags(urldecode($post['email']));
+        $rating->author = strip_tags(urldecode($post['name']));
         $rating->date = time();
-        $rating->title = $post['title'] ? filter_var(urldecode($post['title']), FILTER_SANITIZE_STRING) : NULL;
-        $rating->review = $post['review'] ? filter_var(urldecode($post['review']), FILTER_SANITIZE_STRING) : NULL;
+        $rating->title = $post['title'] ? strip_tags(urldecode($post['title'])) : NULL;
+        $rating->review = $post['review'] ? strip_tags(urldecode($post['review'])) : NULL;
         $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
         // NOTE: system.languages.supported must be set in order to get a correct language.
         if($this->language->enabled()) {
