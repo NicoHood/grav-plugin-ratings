@@ -113,6 +113,7 @@ class Ratings
             'body' => '',
             'template' => 'email/activate_rating.html.twig',
             'to' => $rating->email,
+            'to_name' => $rating->author,
             'content_type' => 'text/html'];
 
         $template_vars = [
