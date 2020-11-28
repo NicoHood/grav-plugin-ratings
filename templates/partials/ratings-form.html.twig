@@ -2,7 +2,7 @@
     {% set scope = scope ?: 'data.' %}
 
     {# Show error or success message #}
-    <div class="alert">{{ form.message }}</div>
+    <div class="alert">{{ form.message|raw }}</div>
 
     {# Only display form if it is empty or a validation error occured.
        Hide the form when the submission was successfull. #}
