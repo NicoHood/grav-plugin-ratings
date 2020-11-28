@@ -207,7 +207,7 @@ class Ratings
     public function getRatingFromPostData($post) : Rating {
         $rating = new Rating();
 
-        $rating->page = $this->grav['uri']->path();
+        $rating->page = $this->grav['page']->route();
         $rating->email = strip_tags(urldecode($post['email']));
         $rating->author = strip_tags(urldecode($post['name']));
         $rating->date = time();

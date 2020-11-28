@@ -256,8 +256,8 @@ class RatingsPlugin extends Plugin
      * Only add twig rating variables when the current page is enabled for being rated.
      */
     public function onTwigSiteVariablesWhenActive() {
-        $path = $this->grav['uri']->path();
         $page = $this->grav['page'];
+        $path = $page->route();
 
         $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
         $this->grav['twig']->twig_vars['ratings'] = $this->grav['ratings']->getActiveModeratedRatings($path);
