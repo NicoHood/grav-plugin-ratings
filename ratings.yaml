@@ -38,7 +38,8 @@ send_confirmation_email: false
 
 form:
     name: ratings
-    anchor: '#modal-rating'
+    # NOTE: Make sure to quote the anchor here!
+    action: '#modal-rating'
 
     fields:
         # Try to prevent spam by using a honeypot instead of a recaptcha
