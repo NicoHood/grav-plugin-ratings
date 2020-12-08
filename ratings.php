@@ -265,6 +265,7 @@ class RatingsPlugin extends Plugin
         $this->grav['twig']->twig_vars['rating_results'] = $results;
 
         // Add SEO structured data
+        // TODO this should be moved to onPageProcessed event
         $config = $this->mergeConfig($page);
         $schema = $config->get('add_json_ld', false);
         if($this->enable && $results['count'] > 0 && $schema) {
