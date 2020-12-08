@@ -142,7 +142,7 @@ class RatingsPlugin extends Plugin
 
         // Filter page template
         if (!empty($enable_on_templates)) {
-            if (!in_array($this->grav['page']->template(), $enable_on_templates, true)) {
+            if (!in_array($page->template(), $enable_on_templates, true)) {
                 return;
             }
         }
