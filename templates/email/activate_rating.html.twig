@@ -4,7 +4,7 @@
   <h1>{{ 'PLUGIN_RATINGS.EMAIL_HEADLINE'|t }}</h1>
   <p>{{ 'PLUGIN_RATINGS.EMAIL_GREETING'|t(rating.author) }} </p>
   <p>
-    {{ 'PLUGIN_RATINGS.EMAIL_MESSAGE'|t('<b><a href="' ~ base_url_absolute ~ '">' ~ site.title ~ '</a></b>') }}
+    {{ 'PLUGIN_RATINGS.EMAIL_MESSAGE'|t(('<b><a href="' ~ base_url_absolute ~ '">' ~ site.title|e ~ '</a></b>'))|raw }}
   </p>
   <p>
     <br/>

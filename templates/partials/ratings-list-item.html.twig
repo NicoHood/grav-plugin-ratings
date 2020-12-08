@@ -1,0 +1,27 @@
+<div class="card rating-card">
+  <div class="card-header">
+    <div class="card-title h5">
+      {{ rating.author|e }}
+    </div>
+    <div class="card-subtitle text-gray">
+      <ul class="rating-score" data-rating="{{ rating.stars|e }}">
+        <li class="rating-score-item"></li>
+        <li class="rating-score-item"></li>
+        <li class="rating-score-item"></li>
+        <li class="rating-score-item"></li>
+        <li class="rating-score-item"></li>
+      </ul>
+
+      {# NOTE: Timezone is picked up from php.ini #}
+      {{ rating.date|e|date("d.m.Y") }}
+    </div>
+  </div>
+  <div class="card-body">
+    {% if rating.title %}
+      <h6 style="margin: 0; font-weight: bold;">{{ rating.title|e }}</h6>
+    {% endif %}
+    <p>
+      {{ rating.review|e }}
+    </p>
+  </div>
+</div>

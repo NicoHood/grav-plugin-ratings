@@ -2,13 +2,22 @@
     {% set scope = scope ?: 'data.' %}
 
     {# Show error or success message #}
-    <div class="alert">{{ form.message }}</div>
+    <div class="alert">{{ form.message|raw }}</div>
 
     {# Only display form if it is empty or a validation error occured.
        Hide the form when the submission was successfull. #}
     {% if form.message is null or form.status != 'success' %}
+
+      {% set action = action ?? (grav.config.plugins.ratings.form.action ?: page.route ~ uri.params) %}
+      {% set action = (action starts with 'http') or (action starts with '#') ? action : base_url ~ action %}
+      {% set action = action|trim('/', 'right') %}
+
+      {% if (action == base_url_relative) %}
+          {% set action = base_url_relative ~ '/' %}
+      {% endif %}
+
       <form name="{{ grav.config.plugins.ratings.form.name }}"
-            action="{{ grav.config.plugins.ratings.form.action ? base_url ~ grav.config.plugins.ratings.form.action : page.url }}{{ grav.config.plugins.ratings.form.anchor ? grav.config.plugins.ratings.form.anchor }}"
+            action="{{ action }}"
             method="{{ grav.config.plugins.ratings.form.method|upper|default('POST') }}">
 
           {% for field in grav.config.plugins.ratings.form.fields %}

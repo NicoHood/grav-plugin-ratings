@@ -1,7 +1,7 @@
 {% if enable_ratings_plugin %}
 
   <div class="ratings-summary">
-    <span class="ratings-summary-average">{{ rating_results.average }}</span>
+    <span class="ratings-summary-average">{{ rating_results.average ? rating_results.average|number_format(1) : '?' }}</span>
 
     <ul class="rating-score" data-rating="{{ rating_results.average_rounded }}">
       <li class="rating-score-item"></li>

@@ -151,7 +151,7 @@ class RatingsPlugin extends Plugin
 
         // Filter page template
         if (!empty($enable_on_templates)) {
-            if (!in_array($this->grav['page']->template(), $enable_on_templates, true)) {
+            if (!in_array($page->template(), $enable_on_templates, true)) {
                 return;
             }
         }
@@ -373,8 +373,8 @@ class RatingsPlugin extends Plugin
      * Only add twig rating variables when the current page is enabled for being rated.
      */
     public function onTwigSiteVariablesWhenActive() {
-        $path = $this->grav['uri']->path();
         $page = $this->grav['page'];
+        $path = $page->route();
 
         $this->grav['twig']->twig_vars['enable_ratings_plugin'] = $this->enable;
         $this->grav['twig']->twig_vars['ratings'] = $this->grav['ratings']->getActiveModeratedRatings($path);
@@ -382,12 +382,13 @@ class RatingsPlugin extends Plugin
         $this->grav['twig']->twig_vars['rating_results'] = $results;
 
         // Add SEO structured data
+        // TODO this should be moved to onPageProcessed event
         $config = $this->mergeConfig($page);
         $schema = $config->get('add_json_ld', false);
         if($this->enable && $results['count'] > 0 && $schema) {
             // Check plugin dependency
-            if (!$this->config->get('plugins.structured-data.enabled')) {
-                throw new \RuntimeException($this->grav['language']->translate('Plugin "structured-data" not enabled/installed. Unable to add json-ld.'));
+            if (!$this->config->get('plugins.seo.enabled')) {
+                throw new \RuntimeException($this->grav['language']->translate('Plugin "seo" not enabled/installed. Unable to add json-ld.'));
             }
 
             $header = new Data((array)$page->header());
@@ -403,15 +404,15 @@ class RatingsPlugin extends Plugin
             // The rating can be added as general schema (and referenced via its id)
             // Or the rating can be attached to another schema, like a local_business.
             if ($schema === true) {
-                $data['add_json_ld'] = true;
-                $header->set('structured-data.aggregate_rating', $data);
+                $header->set('seo.aggregate_rating.add_json_ld', true);
+                $header->set('structured_data.aggregate_rating', $data);
             }
             else {
-                $header->set('structured-data.' . $schema . '.aggregate_rating', $data);
+                $header->set('structured_data.' . $schema . '.aggregate_rating', $data);
             }
 
             // Set new header
-            $page->header($header);
+            $page->header($header->toArray());
         }
     }
 
