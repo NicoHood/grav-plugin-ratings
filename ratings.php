@@ -100,19 +100,21 @@ class RatingsPlugin extends Plugin
         $this->calculateEnable();
 
         // Enable the main events we are interested in
-        if ($this->enable) {
-            // NOTE: We must add the form here and not in the onFormPageHeaderProcessed event.
-            // The mentioned event will run before onPageInitialized, but we can only validate
-            // the page template filters after the page got initialized. Thatswhy the form will be
-            // added at this later stage.
-            $this->grav['page']->addForms([$this->grav['config']->get('plugins.ratings.form')]);
-
-            $this->enable([
-                'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
-                'onFormProcessed' => ['onFormProcessed', 0],
-                'onTwigSiteVariables' => ['onTwigSiteVariablesWhenActive', 100]
-            ]);
+        if (!$this->enable) {
+            return;
         }
+
+        // NOTE: We must add the form here and not in the onFormPageHeaderProcessed event.
+        // The mentioned event will run before onPageInitialized, but we can only validate
+        // the page template filters after the page got initialized. Thatswhy the form will be
+        // added at this later stage.
+        $this->grav['page']->addForms([$this->grav['config']->get('plugins.ratings.form')]);
+
+        $this->enable([
+            'onFormValidationProcessed' => ['onFormValidationProcessed', 0],
+            'onFormProcessed' => ['onFormProcessed', 0],
+            'onTwigSiteVariables' => ['onTwigSiteVariablesWhenActive', 100]
+        ]);
     }
 
     /**
