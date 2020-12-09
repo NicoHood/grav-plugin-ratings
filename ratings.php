@@ -361,7 +361,7 @@ class RatingsPlugin extends Plugin
         // Redirect to the rated page (Add query string and anchor)
         $redirect_route = $verification_code['page'];
         $redirect_code = null;
-        $this->grav->redirectLangSafe($redirect_route . '?code=' . $code . $this->config->get('plugins.ratings.form.anchor'), $redirect_code);
+        $this->grav->redirectLangSafe($redirect_route . '?code=' . $code . $this->config->get('plugins.ratings.form.action'), $redirect_code);
         return true;
     }
 
