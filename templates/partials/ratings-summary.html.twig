@@ -14,6 +14,12 @@
     <div class="ratings-summary-count">
       {{ rating_results.count }} {{ 'PLUGIN_RATINGS.RATINGS'|t }}
     </div>
+
+    {% if rating_results.verified_count %}
+      <div class="ratings-summary-verified-count">
+        &#x2714;{{ rating_results.verified_count }} {{ 'PLUGIN_RATINGS.VERIFIED'|t }}
+      </div>
+    {% endif %}
   </div>
 
 {% endif %}

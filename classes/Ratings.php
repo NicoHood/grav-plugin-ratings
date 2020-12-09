@@ -274,6 +274,9 @@ class Ratings
         $max = 5;
         $count = count($ratings);
         $stars = array_fill($min, $max, 0);
+        $verified_count = count(array_filter($ratings, function(Rating $rating) : bool {
+            return $rating->verified;
+        }));
 
         // Calculate average
         $sum = 0;
@@ -290,6 +293,7 @@ class Ratings
             "min" => $min,
             "max" => $max,
             "count" => (int) $count,
+            "verified_count" => $verified_count,
             "average" => (float) $average,
             "average_rounded" => (float) $average_rounded,
             "1" => (int) $stars[1],

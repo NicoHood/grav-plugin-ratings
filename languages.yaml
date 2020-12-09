@@ -40,6 +40,7 @@ en:
     BUILTIN_CSS_HELP: 'Include the CSS provided by the plugin'
     INVALID_VERIFICATION_CODE: 'Invalid verification code.'
     VERIFICATION_CODE_ALREADY_USED: 'Verification code already used.'
+    VERIFIED: 'Verified'
 
 de:
   PLUGIN_RATINGS:
@@ -81,3 +82,4 @@ de:
     RATE_NOW: "Jetzt Bewerten"
     INVALID_VERIFICATION_CODE: 'Ungültiger Verifizierungscode.'
     VERIFICATION_CODE_ALREADY_USED: 'Verifizierungscode bereits verwendet.'
+    VERIFIED: 'Verifiziert'
