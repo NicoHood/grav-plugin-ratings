@@ -240,7 +240,7 @@ class Ratings
             $rating->lang = $this->language->getLanguage();
         }
         $rating->moderated = !$this->grav['config']->get('moderation');
-        $rating->verification_code = $post['code'] ? preg_replace('/\D/', '', filter_var(urldecode($post['code']), FILTER_SANITIZE_STRING)) : NULL;
+        $rating->verification_code = $post['code'] ? preg_replace('/\D/', '', strip_tags(urldecode($post['code']))) : NULL;
 
         // Get email and author from grav login (ignore POST data)
         if (isset($this->grav['user'])) {
