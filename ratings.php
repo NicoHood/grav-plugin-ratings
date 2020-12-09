@@ -71,18 +71,18 @@ class RatingsPlugin extends Plugin
     {
         // Don't proceed if we are in the admin plugin
         if ($this->isAdmin()) {
-            $this->active = false;
             return;
         }
 
-        // TODO check for routes at a very early state?
-
+        // TODO check for routes at a very early state? -> only then enable onPageInitialized() event
         $this->enable([
             'onPageInitialized' => ['onPageInitialized', 1000],
             'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
             'onTwigSiteVariables' => ['onTwigSiteVariables', 0],
+            'onTwigInitialized' => ['onTwigInitialized', 0],
+
+            // Always check for verification form processing
             'onFormProcessed' => ['onVerificationCodeFormProcessed', 0],
-            'onTwigInitialized' => ['onTwigInitialized', 0]
         ]);
 
         // Handle activation token links
@@ -227,6 +227,7 @@ class RatingsPlugin extends Plugin
             throw new ValidationException($language->translate('PLUGIN_RATINGS.REACHED_RATING_LIMIT'));
         }
 
+        // NOTE: Does not trigger on empty input, but on invalid input.
         if ($rating->verification_code !== NULL) {
             if ($this->grav['ratings']->isVerificationCodeAlreadyUsed($rating->verification_code)) {
                 throw new ValidationException($language->translate('PLUGIN_RATINGS.VERIFICATION_CODE_ALREADY_USED'));
@@ -266,10 +267,6 @@ class RatingsPlugin extends Plugin
         $action = $event['action'];
         $params = $event['params'];
 
-        if (!$this->active) {
-            return;
-        }
-
         switch ($action) {
             case 'addRating':
                 $rating = $this->grav['ratings']->getRatingFromPostData($form->data());
@@ -299,12 +296,6 @@ class RatingsPlugin extends Plugin
         $form = $event['form'];
         $action = $event['action'];
         $params = $event['params'];
-
-        // TODO If we implement the active flag, the verification processing must be excluded.
-        // It would make sense to move the verification functionality into a separate plugin
-        if (!$this->active) {
-            return;
-        }
 
         switch ($action) {
             case 'processVerificationCode':
@@ -361,6 +352,9 @@ class RatingsPlugin extends Plugin
         // Redirect to the rated page (Add query string and anchor)
         $redirect_route = $verification_code['page'];
         $redirect_code = null;
+
+        // TODO check if target page was found. If not, log a critical error to the user and the grav log
+        // TODO only append action if it starts with an #anchor
         $this->grav->redirectLangSafe($redirect_route . '?code=' . $code . $this->config->get('plugins.ratings.form.action'), $redirect_code);
         return true;
     }
