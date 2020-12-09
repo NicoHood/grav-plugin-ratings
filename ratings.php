@@ -94,13 +94,6 @@ class RatingsPlugin extends Plugin
                 'onPagesInitialized' => ['handleRatingActivation', 0],
             ]);
         }
-        if ($path === $this->config->get('plugins.ratings.route_verification_code')) {
-            $this->enable([
-                // Third event that subscribes onPagesInitialized
-                // to handle verification code links
-                'onPagesInitialized' => ['handleVerificationCode', 0],
-            ]);
-        }
     }
 
     public function onPageInitialized(Event $event)
