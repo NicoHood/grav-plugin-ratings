@@ -323,7 +323,8 @@ class RatingsPlugin extends Plugin
         /** @var Message $messages */
         $messages = $this->grav['messages'];
 
-        if ($code === NULL) {
+        // On the dedicated rating verification page we do not allow empty codes
+        if (empty($code)) {
             $message = $this->grav['language']->translate('PLUGIN_RATINGS.INVALID_VERIFICATION_CODE');
             $messages->add($message, 'error');
             return false;
@@ -351,7 +352,7 @@ class RatingsPlugin extends Plugin
         $verification_code = $verification_code_repository->getVerificationCode($code);
 
         // Code not found
-        if ($verification_code === NULL || $verification_code['page'] === NULL) {
+        if ($verification_code === NULL || empty($verification_code['page'])) {
             $message = $this->grav['language']->translate('PLUGIN_RATINGS.INVALID_VERIFICATION_CODE');
             $messages->add($message, 'error');
             return false;
