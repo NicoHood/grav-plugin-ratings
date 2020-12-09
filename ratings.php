@@ -499,19 +499,6 @@ class RatingsPlugin extends Plugin
     }
 
     /**
-     * Handle verification code links
-     */
-    public function handleVerificationCode()
-    {
-        /** @var Uri $uri */
-        $uri = $this->grav['uri'];
-
-        // URL Parameter
-        $code = $uri->param('code');
-        $this->redirectVerificationCodeToPage($code);
-    }
-
-    /**
      * Add templates directory to twig lookup paths.
      */
     public function onTwigTemplatePaths()
