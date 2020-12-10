@@ -79,7 +79,7 @@ de:
     ACTIVATION_SUCCESS: "Bewertung erfolgreich aktiviert."
     TOKEN_EXPIRED: "Token abgelaufen."
     RATING_ALREADY_ACTIVATED: "Diese Bewertung wurde bereits erfolgreich aktiviert."
-    RATE_NOW: "Jetzt Bewerten"
+    RATE_NOW: "Jetzt bewerten"
     INVALID_VERIFICATION_CODE: 'Ungültiger Verifizierungscode.'
     VERIFICATION_CODE_ALREADY_USED: 'Verifizierungscode bereits verwendet.'
     VERIFIED: 'Verifiziert'
