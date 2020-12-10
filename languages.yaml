@@ -76,4 +76,4 @@ de:
     ACTIVATION_SUCCESS: "Bewertung erfolgreich aktiviert."
     TOKEN_EXPIRED: "Token abgelaufen."
     RATING_ALREADY_ACTIVATED: "Diese Bewertung wurde bereits erfolgreich aktiviert."
-    RATE_NOW: "Jetzt Bewerten"
+    RATE_NOW: "Jetzt bewerten"
