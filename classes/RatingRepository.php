@@ -13,7 +13,10 @@ class RatingRepository
     protected $db;
 
     // Tables
-    protected $table_ratings = 'ratings';
+    protected string $table_ratings = 'ratings';
+
+    // Table version used to track table migrations
+    protected int $user_version = 0;
 
     public function __construct($database, $connect_string)
     {
@@ -22,6 +25,9 @@ class RatingRepository
 
         if (!$this->db->tableExists($this->table_ratings)) {
             $this->createTables();
+        }
+        else {
+            $this->migrateTables();
         }
     }
 
@@ -48,7 +54,6 @@ class RatingRepository
         $statement->bindValue(':review', $rating->review, PDO::PARAM_STR);
         $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
-        $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
         $statement->bindValue(':reported', $rating->reported, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
@@ -99,7 +104,6 @@ class RatingRepository
               review = :review,
               activated = :activated,
               moderated = :moderated,
-              verified = :verified,
               reported = :reported,
               token = :token,
               expire = :expire,
@@ -117,7 +121,6 @@ class RatingRepository
         $statement->bindValue(':review', $rating->review, PDO::PARAM_STR);
         $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
-        $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
         $statement->bindValue(':reported', $rating->reported, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
@@ -186,7 +189,7 @@ class RatingRepository
         return $results;
     }
 
-    public function createTables()
+    public function createTables(): void
     {
         $commands = [
             // NOTE: Autoincrement is somehow special in sqlite:
@@ -216,6 +219,38 @@ class RatingRepository
         foreach ($commands as $command) {
             $this->db->exec($command);
         }
+    }
+
+    public function migrateTables(): void
+    {
+        $query = "PRAGMA user_version";
+        $statement = $this->db->prepare($query);
+        $statement->execute();
+        $db_user_version = (int) $statement->fetchColumn();
+
+        // Database is up to date
+        if ($db_user_version === $this->user_version)
+        {
+            return;
+        }
+
+        // Check if plugin is outdated and the database on disk is already newer
+        if ($db_user_version > $this->user_version)
+        {
+            throw new \RuntimeException(
+                'Existing database is newer than supported. Current version: ' . $db_user_version
+            );
+        }
+
+        // Migrate database code
+        if ($db_user_version < 1)
+        {
+            // Add migration code here in future version
+        }
+
+        // Set version to latest
+        $command = "PRAGMA user_version = {$this->user_version}";
+        $this->db->exec($command);
     }
 
     protected function supportOnConflict()
