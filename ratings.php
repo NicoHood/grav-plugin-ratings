@@ -84,7 +84,7 @@ class RatingsPlugin extends Plugin
         ]);
 
         // Handle activation token links
-        $path = $this->grav['uri']->path();
+        $path = $this->grav['route']->getRoute();
         if ($path === $this->config->get('plugins.ratings.route_activate')) {
             $this->enable([
                 // Second event that subscribes onPagesInitialized
@@ -121,8 +121,7 @@ class RatingsPlugin extends Plugin
      * Determine if the plugin should be enabled based on the enable_on_routes and disable_on_routes config options
      */
     private function calculateEnable() {
-        $uri = $this->grav['uri'];
-        $path = $uri->path();
+        $path = $this->grav['route']->getRoute();
         $page = $this->grav['page'];
 
         $disable_on_routes = (array) $this->config->get('plugins.ratings.disable_on_routes');
