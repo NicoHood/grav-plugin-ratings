@@ -70,12 +70,10 @@ class RatingsPlugin extends Plugin
     {
         // Don't proceed if we are in the admin plugin
         if ($this->isAdmin()) {
-            $this->active = false;
             return;
         }
 
-        // TODO check for routes at a very early state?
-
+        // TODO check for routes at a very early state? -> only then enable onPageInitialized() event
         $this->enable([
             'onPageInitialized' => ['onPageInitialized', 1000],
             'onTwigTemplatePaths' => ['onTwigTemplatePaths', 0],
@@ -233,10 +231,6 @@ class RatingsPlugin extends Plugin
         $form = $event['form'];
         $action = $event['action'];
         $params = $event['params'];
-
-        if (!$this->active) {
-            return;
-        }
 
         switch ($action) {
             case 'addRating':
