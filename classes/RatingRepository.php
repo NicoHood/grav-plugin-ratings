@@ -54,6 +54,7 @@ class RatingRepository
         $statement->bindValue(':review', $rating->review, PDO::PARAM_STR);
         $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
+        $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
         $statement->bindValue(':reported', $rating->reported, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
@@ -104,6 +105,7 @@ class RatingRepository
               review = :review,
               activated = :activated,
               moderated = :moderated,
+              verified = :verified,
               reported = :reported,
               token = :token,
               expire = :expire,
@@ -121,6 +123,7 @@ class RatingRepository
         $statement->bindValue(':review', $rating->review, PDO::PARAM_STR);
         $statement->bindValue(':activated', $rating->activated, PDO::PARAM_BOOL);
         $statement->bindValue(':moderated', $rating->moderated, PDO::PARAM_BOOL);
+        $statement->bindValue(':verified', $rating->verified, PDO::PARAM_BOOL);
         $statement->bindValue(':reported', $rating->reported, PDO::PARAM_BOOL);
         $statement->bindValue(':token', $rating->token, PDO::PARAM_STR);
         $statement->bindValue(':expire', $rating->expire, PDO::PARAM_INT);
