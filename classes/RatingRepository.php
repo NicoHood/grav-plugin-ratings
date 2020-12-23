@@ -16,7 +16,7 @@ class RatingRepository
     protected string $table_ratings = 'ratings';
 
     // Table version used to track table migrations
-    protected int $user_version = 0;
+    protected int $user_version = 1;
 
     public function __construct($database, $connect_string)
     {
@@ -248,7 +248,17 @@ class RatingRepository
         // Migrate database code
         if ($db_user_version < 1)
         {
-            // Add migration code here in future version
+            // Add verification columns
+            $commands = [
+                "ALTER TABLE {$this->table_ratings}
+                  ADD COLUMN verified BOOL DEFAULT FALSE NOT NULL",
+                "ALTER TABLE {$this->table_ratings}
+                  ADD COLUMN verification_code VARCHAR(255) DEFAULT NULL"
+            ];
+
+            foreach ($commands as $command) {
+                $this->db->exec($command);
+            }
         }
 
         // Set version to latest
