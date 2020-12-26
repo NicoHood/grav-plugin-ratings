@@ -76,7 +76,7 @@ class RatingRepository
 
     public function read(int $id) : array {
         $query = "SELECT id, page, stars, email, author, date, title, review,
-          lang, token, expire, activated, moderated, reported
+          lang, token, expire, activated, moderated, verified, reported, verification_code
           FROM {$this->table_ratings}
           WHERE id = :id";
 
