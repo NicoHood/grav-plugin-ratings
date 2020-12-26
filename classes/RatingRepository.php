@@ -16,7 +16,7 @@ class RatingRepository
     protected string $table_ratings = 'ratings';
 
     // Table version used to track table migrations
-    protected int $user_version = 1;
+    protected int $user_version = 100;
 
     public function __construct($database, $connect_string)
     {
@@ -246,7 +246,7 @@ class RatingRepository
         }
 
         // Migrate database code
-        if ($db_user_version < 1)
+        if ($db_user_version < 100)
         {
             // Add verification columns
             $commands = [
