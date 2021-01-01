@@ -151,7 +151,8 @@ class RatingRepository
         // NOTE: "WHERE 1" is used as dummy to use the AND construct below.
         // Normally "WHERE TRUE" would be nicer, introduced by SQLite 3.23.
         // However some servers are still running debian stretch with SQLite 3.16.
-        $query = "SELECT *
+        $query = "SELECT id, page, stars, email, author, date, title, review,
+          lang, token, expire, activated, moderated, reported
           FROM {$this->table_ratings}
           WHERE 1";
 
