@@ -152,7 +152,7 @@ class RatingRepository
         // Normally "WHERE TRUE" would be nicer, introduced by SQLite 3.23.
         // However some servers are still running debian stretch with SQLite 3.16.
         $query = "SELECT id, page, stars, email, author, date, title, review,
-          lang, token, expire, activated, moderated, reported
+          lang, token, expire, activated, moderated, verified, reported, verification_code
           FROM {$this->table_ratings}
           WHERE 1";
 
