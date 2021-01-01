@@ -212,10 +212,10 @@ class RatingRepository
               lang VARCHAR(255) DEFAULT NULL,
               token VARCHAR(255) DEFAULT NULL,
               expire INTEGER DEFAULT NULL,
-              activated BOOL DEFAULT TRUE NOT NULL,
-              moderated BOOL DEFAULT TRUE NOT NULL,
-              verified BOOL DEFAULT FALSE NOT NULL,
-              reported BOOL DEFAULT FALSE NOT NULL,
+              activated BOOL DEFAULT 1 NOT NULL,
+              moderated BOOL DEFAULT 1 NOT NULL,
+              verified BOOL DEFAULT 0 NOT NULL,
+              reported BOOL DEFAULT 0 NOT NULL,
               verification_code VARCHAR(255) DEFAULT NULL)"
         ];
         // TODO add SQL CONSTRAINT to limit starss to 1-5? -> use config value
