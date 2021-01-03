@@ -4,60 +4,55 @@
     {# Show error or success message #}
     <div class="alert">{{ form.message|raw }}</div>
 
-    {# Only display form if it is empty or a validation error occured.
-       Hide the form when the submission was successfull. #}
-    {% if form.message is null or form.status != 'success' %}
+    {% set action = action ?? (grav.config.plugins.ratings.form.action ?: page.route ~ uri.params) %}
+    {% set action = (action starts with 'http') or (action starts with '#') ? action : base_url ~ action %}
+    {% set action = action|trim('/', 'right') %}
 
-      {% set action = action ?? (grav.config.plugins.ratings.form.action ?: page.route ~ uri.params) %}
-      {% set action = (action starts with 'http') or (action starts with '#') ? action : base_url ~ action %}
-      {% set action = action|trim('/', 'right') %}
-
-      {% if (action == base_url_relative) %}
-          {% set action = base_url_relative ~ '/' %}
-      {% endif %}
-
-      <form name="{{ grav.config.plugins.ratings.form.name }}"
-            action="{{ action }}"
-            method="{{ grav.config.plugins.ratings.form.method|upper|default('POST') }}">
-
-          {% for field in grav.config.plugins.ratings.form.fields %}
-              {% if field.condition is empty or field.condition is not empty and evaluate(field.condition) %}
-                  {% set value = uri.query(field.name) %}
-                  {% if value is empty %}
-                      {% set value = form.value(field.name) %}
-                  {% endif %}
-
-                  {% if field.evaluateDefault %}
-                      {% set value = evaluate(field.evaluateDefault) %}
-                  {% endif %}
-
-                  {% if config.plugins.login.enabled and grav.user.authenticated %}
-                      {% if field.name == 'name' %}
-                          <input type="hidden" name="{{ (scope ~ field.name)|fieldName }}" value="{{grav.user.fullname}}">
-                      {% elseif field.name == 'email' %}
-                          <input type="hidden" name="{{ (scope ~ field.name)|fieldName }}" value="{{grav.user.email}}">
-                      {% else %}
-                          <div>
-                              {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
-                          </div>
-                      {% endif %}
-                  {% else %}
-                      <div>
-                          {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
-                      </div>
-                  {% endif %}
-              {% endif %}
-          {% endfor %}
-          {% include "forms/fields/formname/formname.html.twig" %}
-
-          <div class="buttons">
-          {% for button in grav.config.plugins.ratings.form.buttons %}
-              <button class="{{ form_button_classes ?: 'button' }} {{ button.classes }}" type="{{ button.type|default('submit') }}">{{ button.value|t|default('Submit') }}</button>
-          {% endfor %}
-          </div>
-
-          {{ nonce_field('form', 'form-nonce')|raw }}
-      </form>
+    {% if (action == base_url_relative) %}
+        {% set action = base_url_relative ~ '/' %}
     {% endif %}
+
+    <form name="{{ grav.config.plugins.ratings.form.name }}"
+          action="{{ action }}"
+          method="{{ grav.config.plugins.ratings.form.method|upper|default('POST') }}">
+
+        {% for field in grav.config.plugins.ratings.form.fields %}
+            {% if field.condition is empty or field.condition is not empty and evaluate(field.condition) %}
+                {% set value = uri.query(field.name) %}
+                {% if value is empty %}
+                    {% set value = form.value(field.name) %}
+                {% endif %}
+
+                {% if field.evaluateDefault %}
+                    {% set value = evaluate(field.evaluateDefault) %}
+                {% endif %}
+
+                {% if config.plugins.login.enabled and grav.user.authenticated %}
+                    {% if field.name == 'name' %}
+                        <input type="hidden" name="{{ (scope ~ field.name)|fieldName }}" value="{{grav.user.fullname}}">
+                    {% elseif field.name == 'email' %}
+                        <input type="hidden" name="{{ (scope ~ field.name)|fieldName }}" value="{{grav.user.email}}">
+                    {% else %}
+                        <div>
+                            {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div>
+                        {% include "forms/fields/#{field.type}/#{field.type}.html.twig" %}
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% include "forms/fields/formname/formname.html.twig" %}
+
+        <div class="buttons">
+        {% for button in grav.config.plugins.ratings.form.buttons %}
+            <button class="{{ form_button_classes ?: 'button' }} {{ button.classes }}" type="{{ button.type|default('submit') }}">{{ button.value|t|default('Submit') }}</button>
+        {% endfor %}
+        </div>
+
+        {{ nonce_field('form', 'form-nonce')|raw }}
+    </form>
 
 {% endif %}
