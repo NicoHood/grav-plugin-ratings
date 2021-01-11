@@ -30,17 +30,13 @@
   }
 
   // On hover color all stars grey by default
-  // NOTE: The order is important here!
-  // This must be after the input:checked statement to override it!
   &:hover > input + label {
     @extend %empty-star;
   }
 
   // Hover star color
-  // NOTE: This must be after the general .rating:hover to overwrite it
-  // NOTE: The :enabled pseudo element is used to be more specific and overwrite the other states
-  > input:enabled + label:hover,
-  > input:enabled + label:hover ~ input:enabled + label {
+  &:hover > input + label:hover,
+  &:hover > input + label:hover ~ input + label {
     @extend %full-star;
   }
 }
