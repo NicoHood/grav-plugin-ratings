@@ -38,6 +38,7 @@ en:
     RATE_NOW: "Rate now"
     BUILTIN_CSS: 'Use built in CSS'
     BUILTIN_CSS_HELP: 'Include the CSS provided by the plugin'
+    STARS: 'Stars'
 
 de:
   PLUGIN_RATINGS:
@@ -77,3 +78,4 @@ de:
     TOKEN_EXPIRED: "Token abgelaufen."
     RATING_ALREADY_ACTIVATED: "Diese Bewertung wurde bereits erfolgreich aktiviert."
     RATE_NOW: "Jetzt bewerten"
+    STARS: 'Sterne'
