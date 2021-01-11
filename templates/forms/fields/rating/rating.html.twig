@@ -3,7 +3,7 @@
 {% set originalValue = value %}
 
 {% block input %}
-    <fieldset class="rating-input">
+    <fieldset class="rating-input {{ form_field_wrapper_classes }} {{ field.wrapper_classes }}">
         {# It is important to count from max to min, as this is required by the css. #}
         {% for i in field.validate.max|default(5)..field.validate.min|default(1) %}
             {% set id = field.id|default(field.name) ~ '-star' ~ i %}
@@ -11,7 +11,7 @@
                    value="{{ i|e }}"
                    id="{{ id|e }}"
                    name="{{ (scope ~ field.name)|fieldName }}"
-                   {% if field.classes is defined %}class="{{ field.classes }}" {% endif %}
+                   class="{{ form_field_rating_classes }} {{ field.classes }}"
                    {% if i == value %}checked="checked" {% endif %}
                    {% if field.disabled or isDisabledToggleable %}disabled="disabled"{% endif %}
                    {% if required %}required="required"{% endif %}
