@@ -10,6 +10,7 @@ use Grav\Common\Data\ValidationException;
 use Grav\Plugin\Database\PDO;
 use Grav\Plugin\Ratings\Ratings;
 use Grav\Plugin\Ratings\Rating;
+use Twig\TwigFunction;
 
 /**
  * Class RatingsPlugin
@@ -300,7 +301,7 @@ class RatingsPlugin extends Plugin
     public function onTwigInitialized()
     {
         $this->grav['twig']->twig()->addFunction(
-            new \Twig_SimpleFunction('rating_results', [$this->grav['ratings'], 'getRatingResults'])
+            new TwigFunction('rating_results', [$this->grav['ratings'], 'getRatingResults'])
         );
     }
 
