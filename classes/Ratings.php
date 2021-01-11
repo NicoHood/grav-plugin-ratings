@@ -208,7 +208,7 @@ class Ratings
         $rating = new Rating();
 
         $rating->page = $this->grav['page']->route();
-        $rating->email = strip_tags(urldecode($post['email']));
+        $rating->email = strtolower(strip_tags(urldecode($post['email'])));
         $rating->author = strip_tags(urldecode($post['name']));
         $rating->date = time();
         $rating->title = $post['title'] ? strip_tags(urldecode($post['title'])) : NULL;
