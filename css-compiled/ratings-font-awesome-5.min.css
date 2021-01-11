@@ -34,7 +34,7 @@
 
 .ratings-scorecard .ratings-scorecard-item > div progress::-moz-progress-bar { background: #FFC600; border-radius: 0.1rem; }
 
-.rating-input { border: none; display: inline-flex; flex-direction: row-reverse; margin: 0; padding: 0; }
+.rating-input { border: none; display: flex; flex-direction: row-reverse; justify-content: flex-end; margin: 0; padding: 0; }
 
 .rating-input > input { display: none; }
 

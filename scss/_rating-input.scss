@@ -2,8 +2,9 @@
 // Borrowed from: https://codepen.io/jamesbarnett/pen/vlpkh?editors=1100
 .rating-input {
   border: none;
-  display: inline-flex;
+  display: flex;
   flex-direction: row-reverse;
+  justify-content: flex-end;
   margin: 0;
   padding: 0;
 
