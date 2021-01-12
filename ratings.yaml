@@ -97,6 +97,7 @@ form:
           label: PLUGIN_RATINGS.RATING_LABEL
           default: 0
           validate:
+            type: number
             min: 1
             max: 5
             required: true

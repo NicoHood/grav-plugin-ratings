@@ -213,7 +213,8 @@ class Ratings
         $rating->date = time();
         $rating->title = $post['title'] ? strip_tags(urldecode($post['title'])) : NULL;
         $rating->review = $post['review'] ? strip_tags(urldecode($post['review'])) : NULL;
-        $rating->stars = (int) filter_var(urldecode($post['stars']), FILTER_SANITIZE_NUMBER_INT);
+        $stars = $post['stars'];
+        $rating->stars = is_int($stars) ? $stars : (int) filter_var(urldecode($stars), FILTER_SANITIZE_NUMBER_INT);
         // NOTE: system.languages.supported must be set in order to get a correct language.
         if($this->language->enabled()) {
             $rating->lang = $this->language->getLanguage();

@@ -163,38 +163,13 @@ class RatingsPlugin extends Plugin
     }
 
     /**
-     * Before processing the form, make sure that user votes multiple times with the same email.
+     * Before processing the form, make sure that user does not vote multiple times with the same email.
      *
      * @param Event $event
      */
     public function onFormValidationProcessed(Event $event)
     {
         $language = $this->grav['language'];
-
-        // Special check for rating field
-        foreach ($event['form']->getFields() as $field) {
-            if ($field['type'] === 'rating') {
-                // Get POST data and convert string to int
-                $raw_data = $event['form']->value($field['name']);
-                $rating_string = filter_var(urldecode($raw_data), FILTER_SANITIZE_NUMBER_INT);
-                $rating = filter_var($rating_string, FILTER_VALIDATE_INT);
-
-                // Check if the data is an integer
-                if($rating === false) {
-                    throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING'));
-                }
-
-                // Validate minimum and maximum settings
-                if(isset($field['validate'])) {
-                    if(isset($field['validate']['min']) && $rating < $field['validate']['min']) {
-                        throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING_MIN'));
-                    }
-                    if(isset($field['validate']['max']) && $rating > $field['validate']['max']) {
-                        throw new ValidationException($language->translate('PLUGIN_RATINGS.INVALID_RATING_MAX'));
-                    }
-                }
-            }
-        }
 
         // The following validation rules only apply to the ratings form, introduced by the ratings plugin.
         if($event['form']->name !== $this->grav['config']->get('plugins.ratings.form.name')) {
