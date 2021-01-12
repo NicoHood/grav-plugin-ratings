@@ -17,8 +17,8 @@ en:
     BY: by
     THANK_YOU_MESSAGE: "Thank you for your rating. Please check your inbox and click on the confirmation link to active your rating."
     INVALID_RATING: "Invalid rating data passed."
-    PLUGIN_RATINGS.INVALID_RATING_MIN: "The rating is below the minimum."
-    PLUGIN_RATINGS.INVALID_RATING_MAX: "The rating is above the maximum."
+    INVALID_RATING_MIN: "The rating is below the minimum."
+    INVALID_RATING_MAX: "The rating is above the maximum."
     ALREADY_RATED: "You have already rated this post."
     REACHED_RATING_LIMIT: "You have already voted on too many topics."
     ACTIVATION_EMAIL_SUBJECT: "Activate your rating on %s"
@@ -59,8 +59,8 @@ de:
     BY: von
     THANK_YOU_MESSAGE: "Vielen Dank für deine Bewertung! Wir haben dir soeben eine Bestätigungsemail gesendet. Um deine Bewertung auf der Website anzuzeigen, klicke bitte auf den Bestätigungslink in der E-Mail."
     INVALID_RATING: "Ungültige Bewertungsdaten übergeben"
-    PLUGIN_RATINGS.INVALID_RATING_MIN: "Die Bewertung liegt unter dem Minimum."
-    PLUGIN_RATINGS.INVALID_RATING_MAX: "Die Bewertung liegt über dem Maximum."
+    INVALID_RATING_MIN: "Die Bewertung liegt unter dem Minimum."
+    INVALID_RATING_MAX: "Die Bewertung liegt über dem Maximum."
     ALREADY_RATED: "Du hast diesen Beitrag bereits bewertet."
     REACHED_RATING_LIMIT: "Sie haben bereits über zu viele Themen abgestimmt."
     ACTIVATION_EMAIL_SUBJECT: "Aktiviere deine Bewertung auf %s"
