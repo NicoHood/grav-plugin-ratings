@@ -208,6 +208,7 @@ class Ratings
         $rating = new Rating();
 
         $rating->page = $this->grav['page']->route();
+        // NOTE: Always use lower case emails to avoid duplicate entries
         $rating->email = strtolower(strip_tags(urldecode($post['email'])));
         $rating->author = strip_tags(urldecode($post['name']));
         $rating->date = time();
