@@ -1,7 +1,5 @@
 # Ratings Plugin
 
-**This README.md file should be modified to describe the features, installation, configuration, and general usage of the plugin.**
-
 The **Ratings** Plugin is an extension for [Grav CMS](http://github.com/getgrav/grav). A plugin for add 5 star ratings and reviews to grav pages.
 
 ## Installation
@@ -75,12 +73,4 @@ languages:
   supported:
    - en
 ```
-
-## Credits
-
-**Did you incorporate third-party code? Want to thank somebody?**
-
-## To Do
-
-- [ ] Future plans, if any
 
