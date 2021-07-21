@@ -16,7 +16,7 @@
     @extend %empty-star;
   }
 
-  @for $i from 0 to 6 {
+  @for $i from 0 through 5 {
     &[data-rating='#{$i}'] {
       .rating-score-item:nth-child(-n + #{$i}) {
         @extend %full-star;
