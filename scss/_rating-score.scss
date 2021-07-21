@@ -16,13 +16,15 @@
     @extend %empty-star;
   }
 
-  @for $i from 0 through 5 {
+  @for $i from 1 through 5 {
     &[data-rating='#{$i}'] {
       .rating-score-item:nth-child(-n + #{$i}) {
         @extend %full-star;
       }
     }
-
+  }
+  
+  @for $i from 0 through 4 {
     &[data-rating='#{$i + 0.5}'] {
       .rating-score-item:nth-child(-n + #{$i}) {
         @extend %full-star;
